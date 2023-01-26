@@ -595,12 +595,7 @@ p {
 /*
 2.4 Socail icons
 ************/
- .social {
-    list-style: none;
-    float: none;
-    position:relative;
-    margin:5px; auto;
-}
+
 .social li {
     display:inline-block;
     line-height: 32px;
