@@ -10,8 +10,6 @@
 2.Layout
  2.1 Animations
  2.2 Buttons
- 2.3 Thumbnail - overide bootstrap thumbnail and add mased efect
- 2.4 Socail icons -style for social icons list
 3 Sections - definition for section and subsection
  3.1 Services
  3.2 Portfolio
@@ -519,100 +517,9 @@ p {
     background-color:#FECE1A;
     color:#181A1C;
 }
-/*
-2.3 Thumbnails - Predefined bootstrap's thumbnail class.
-**********/
- .thumbnail {
-    width:100%;
-    height:100%;
-    padding:0;
-    overflow: hidden;
-    position: relative;
-    border:0;
-    border-radius:0;
-    box-shadow:none;
-    text-align:center;
-    background: #191a1c;
-}
-.thumbnail .more {
-    display:block;
-    z-index:4;
-    position:absolute;
-    top:-100px;
-    left:50%;
-    margin:0 auto;
-    margin-left:-41px;
-    width:80px;
-    height:80px;
-    font-size:40px;
-    color:#fff;
-    text-decoration:none;
-    line-height: 70px;
-    text-align: center;
-}
-.thumbnail:hover .more {
-    top:40%;
-    margin-top:-40px;
-    -webkit-transition: all 0.3s ease-out;
-    -moz-transition: all 0.3s ease-out;
-    -o-transition: all 0.3 s ease-out;
-    -ms-transition: all 0.3s ease-out;
-    transition: all 0.3s ease-out;
-}
-.thumbnail h3,
-.thumbnail p {
-    margin:0;
-    padding:0;
-    position:relative;
-    z-index:4;
-}
-.thumbnail h3 {
-    color: #FECE1A;
-    margin-top:10px;
-    font-size:20px;
-}
-.thumbnail > p {
-    padding-bottom:20px;
-}
-.thumbnail .mask {
-    opacity:0.85;
-    filter: alpha(opacity=85);
-    top:100%;
-    left:0;
-    width:100%;
-    height:100%;
-    background:#181A1C;
-    position:absolute;
-    -webkit-transition: all 0.2s ease-out;
-    -moz-transition: all 0.2s ease-out;
-    -o-transition: all 0.2 s ease-out;
-    -ms-transition: all 0.2s ease-out;
-    transition: all 0.2s ease-out;
-}
-.thumbnail:hover .mask {
-    top:0;
-}
-/*
-2.4 Socail icons
-************/
 
-.social li {
-    display:inline-block;
-    line-height: 32px;
-    font-family:'Porta';
-    font-size: 32px;
-    padding:0 5px;
-}
-.social li a {
-    margin:0;
-    padding:0;
-    width:32px;
-    height:32px;
-    color: #FECE1A;
-}
-.social li a:hover {
-    color:#181A1C;
-}
+
+
 /*
 3. Sections
 ***************************************************************************/
