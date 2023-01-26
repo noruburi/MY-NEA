@@ -1,0 +1,12 @@
+<div class="navbar">
+  <a class="nav-item nav-link" id="login" href="/">Home</a>
+  <a class="nav-item nav-link" id="login" href="/sign_up">Home</a>
+  {% if not session['user'] %}
+  <a class="nav-item nav-link" id="login" href="/login">Login</a>
+  {% else %}
+    {% if session['usert']=="executive" %}
+    {% endif %}
+    <a href="#contact">Contact Us</a>
+    <a href="{{ url_for('logout') }}" class="nav-link">Logout</a>
+  {% endif %}
+</div>
