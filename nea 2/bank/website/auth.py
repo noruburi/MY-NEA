@@ -22,9 +22,9 @@ def sign_up():
         password2 = request.form.get('password2')
 
         if password1 != password2:
-            flash('passwords don\'t match')
+            flash('passwords don\'t match', category='error')
         else:
-            flash('account created !')
+            flash('account created !', category='sucess')
 
 
     return render_template("sign_up.html", boolean=True)
