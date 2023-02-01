@@ -22,7 +22,7 @@ def password_strength(password):
         score += 1
     if any(char.isupper() for char in password):
         score += 1
-    if any(char in set(r"!@#$%^&*()") for char in password):
+    if any(char in set(r"!@#$%^&*()/") for char in password):
         score += 1
     if score >= 4:
         return score, "Password is strong."
@@ -34,8 +34,8 @@ def password_strength(password):
             missing_requirements.append("Password must contain at least one digit.")
         if not any(char.isupper() for char in password):
             missing_requirements.append("Password must contain at least one uppercase letter.")
-        if not any(char in set(r"!@#$%^&*()") for char in password):
-            missing_requirements.append("Password must contain at least one symbol (!@#$%^&*()).")
+        if not any(char in set(r"!@#$%^&*()/") for char in password):
+            missing_requirements.append("Password must contain at least one symbol (!@#$%^&*()/).")
         return score, ", ".join(missing_requirements)
 
 @auth.route('/sign_up', methods=['GET', 'POST'])
