@@ -1,8 +1,14 @@
 from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+
+db = SQLAlchemy()
+DB_NAME = "database.db"
 
 def create_app():
     app = Flask(__name__)
     app.config['SECRET_KEY'] = 'hjshjhdjah kjshkjdhjs'
+    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_NAME}'#store database inside the directory of the init.py file
+    db.init_app(app)
 
     from .views import views #imports the blueprint to show flask where to find the url
     from .auth  import auth

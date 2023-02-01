@@ -55,7 +55,9 @@ def sign_up():
         elif password1 != password2:
             flash('Passwords don\'t match.', category='error')
         elif len(password1) < 7:
-            flash('Password must be at least 7 characters.', category='error')            
+            flash('Password must be at least 7 characters.', category='error')  
+        elif len(password1) > 25:
+            flash('Password can only be 25 or less characters.', category='error')             
         else:
             score, message = password_strength(password1)
             if score < 4:
