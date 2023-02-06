@@ -1,7 +1,7 @@
 <div class="navbar">
   {% if user.is_authenticated %}
   <a class="nav-item nav-link" id="login" href="/">Profile</a>
-  <a class="nav-item nav-link" id="login" class="">Logout</a>
+  <a class="nav-item nav-link" id="logout" href="/logout">Logout</a>
   {% else %}
   <a class="nav-item nav-link" id="login" href="/landing">Home</a>
   <a class="nav-item nav-link" id="login" href="/login">Login</a>
