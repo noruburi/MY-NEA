@@ -22,7 +22,14 @@ def login():
         user = User.query.filter_by(email=email).first()
         if user:
             if check_password_hash(user.password, password):
-                flash('Logged in successfully!', category='success')
+                if user.role == "admin":
+                    flash('Logged in as admin successfully!', category='success')
+                elif user.role == "teacher":
+                    if not user.is_approved:
+                        flash('Teacher role not approved yet.', category='error')
+                        return redirect(url_for('auth.login'))
+                elif user.role == "student":
+                    flash('Logged in as student successfully!', category='success')
                 login_user(user, remember=True)
                 return redirect(url_for('views.home'))
             else:
@@ -30,7 +37,8 @@ def login():
         else:
             flash('Email does not exist.', category='error')
 
-    return render_template("login.html", user=current_user)
+    return render_template('login.html')
+
 
 @auth.route('/logout')
 @login_required
