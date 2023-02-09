@@ -32,18 +32,20 @@ def create_app():
     def load_user(id):
         return User.query.get(int(id))
 
-    @app.before_first_request
-    def create_admin_user():
-        admin = User.query.filter_by(email='admin@Kimberley.com').first()
-        if not admin:
-            admin = User(email='admin@Kimberley.com', password=generate_password_hash('secret', method='sha256'), first_name='Admin', role='admin')
-            db.session.add(admin)
-            db.session.commit()
+    # @app.before_first_request
+    # def create_admin_user():
+    #     admin = User.query.filter_by(email='admin@Kimberley.com').first()
+    #     if not admin:
+    #         admin = User(email='admin@Kimberley.com', password=generate_password_hash('secret', method='sha256'), first_name='Admin', role='admin')
+    #         db.session.add(admin)
+    #         db.session.commit()
 
     return app
 
+# def create_database(app):
+#     if not path.exists('website/' + DB_NAME):
+#         db.create_all(app=app)
+#         print('create_database')
 def create_database(app):
-    if not path.exists('website/' + DB_NAME):
-        db.create_all(app=app)
-        print('create_database')
+    db.create_all(app=app)
 
