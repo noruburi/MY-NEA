@@ -1,26 +1,27 @@
 from . import db
 from flask_login import UserMixin
 
-
+class Role(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(25), unique=True)
 
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(150), unique=True)
-    password = db.Column(db.String(25))
+    email = db.Column(db.String(150), unique=True, index=True)
+    password = db.Column(db.String(255))
     first_name = db.Column(db.String(25))
-    role = db.Column(db.string(20))
+    role_id = db.Column(db.Integer, db.ForeignKey(Role.id))
 
 class Account(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     type = db.Column(db.Integer)
-    balance = db.Column(db.Integer,)
+    balance = db.Column(db.Integer)
 
-class transactions(db.Model, UserMixin):
+class Transactions(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     sequence = db.Column(db.Integer)
     from_account_id = db.Column(db.Integer)
-    dateTime = db.column(db.Integer)
+    dateTime = db.Column(db.DateTime)
     to_account_id = db.Column(db.Integer)
-    ammount = db.Column(db.Integer)
+    amount = db.Column(db.Integer)
     
-
