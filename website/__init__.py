@@ -2,6 +2,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from os import path
 from flask_login import LoginManager
+from werkzeug.security import generate_password_hash, check_password_hash
 
 db = SQLAlchemy()
 DB_NAME = "database.db"
@@ -20,7 +21,8 @@ def create_app():
     app.register_blueprint(views, url_prefix='/')
     app.register_blueprint(auth, url_prefix='/')
 
-    from .models import User 
+    from .models import User,Role
+
 
     with app.app_context():
         db.create_all()
@@ -33,6 +35,7 @@ def create_app():
     def load_user(id):
         return User.query.get(int(id))
 
+
     # @app.before_first_request
     # def create_admin_user():
     #     admin = User.query.filter_by(email='admin@Kimberley.com').first()
@@ -40,6 +43,23 @@ def create_app():
     #         admin = User(email='admin@Kimberley.com', password=generate_password_hash('secret', method='sha256'), first_name='Admin', role='admin')
     #         db.session.add(admin)
     #         db.session.commit()
+
+
+    @app.before_first_request
+    def create_admin_user():
+        admin_role = Role.query.filter_by(name='admin').first()
+        if not admin_role:
+            admin_role = Role(name='admin')
+            db.session.add(admin_role)
+            db.session.commit()
+
+            admin = User.query.filter_by(email='admin@Kimberley.com').first()
+            if not admin:
+                admin = User(email='admin@Kimberley.com', password=generate_password_hash('secret', method='sha256'), first_name='Admin', role_id=admin_role.id)
+                db.session.add(admin)
+                db.session.commit()
+
+
 
     return app
 
