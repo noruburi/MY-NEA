@@ -1,7 +1,24 @@
 {% extends "base.html" %}
 
-{% block title %}dashboard{% endblock %}
+{% block title %}Admin Dashboard{% endblock %}
 {% block content %}
 
+<div class="d-flex justify-content-center">
+    <div class="card">
+        <div class="card-header">
+            <h3>Admin Dashboard</h3>
+        </div>
+        <div class="card-body">
+            <div class="d-flex justify-content-center">
+                <a href="/admin/manage_users" class="btn btn-primary m-3">Manage Users</a>
+                <a href="/admin/manage_transactions" class="btn btn-primary m-3">Manage Transactions</a>
+                <a href="/admin/manage_loans" class="btn btn-primary m-3">Manage Loans</a>
+            </div>
+        </div>
+    </div>
+</div>
 
 {% endblock %}
+
+
+
