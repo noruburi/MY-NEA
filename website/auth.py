@@ -22,13 +22,15 @@ def login():
         user = User.query.filter_by(email=email).first()
         if user:
             if check_password_hash(user.password, password):
-                if user.role == "admin":
+                role = user.role
+                if role.name == "admin":
                     flash('Logged in as admin successfully!', category='success')
-                elif user.role == "teacher":
+                    return redirect(url_for('auth.admin_page'))
+                elif role.name == "teacher":
                     if not user.is_approved:
                         flash('Teacher role not approved yet.', category='error')
                         return redirect(url_for('auth.login'))
-                elif user.role == "student":
+                elif role.name == "student":
                     flash('Logged in as student successfully!', category='success')
                 login_user(user, remember=True)
                 return redirect(url_for('views.home'))
@@ -37,8 +39,11 @@ def login():
         else:
             flash('Email does not exist.', category='error')
 
-    return render_template('login.html')
+    return render_template('login.html',user=current_user)
 
+@auth.route('/admin')
+def admin_page():
+    return render_template('admin.html',user=current_user)
 
 @auth.route('/logout')
 @login_required
