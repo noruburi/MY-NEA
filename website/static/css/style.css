@@ -283,13 +283,7 @@ p {
     width: 100%;
     }
 
-@media (max-width: 384px)
-{
-  .navbarlogo .brand p{
-    line-height: 30px;
-    /* color: #000000; */
-  }
-}
+
 /******
 2. Layout
 **********************************************************************/
@@ -431,99 +425,7 @@ p {
     /* height:120px; */
     /* overflow: auto; */
 }
-.highlighted-box h1{
-  color: #FFA500 !important;
-}
-.highlighted-box p{
-    color: #181A1C !important;
-    font-weight: bold;
-    text-align: justify;
-    /* font-size: 1.2em; */
-}
-.highlighted-box p, .highlighted-box td{
-    color: #181A1C !important;
-    font-weight: bold;
-    /* font-size: 2em; */
-}
-.highlighted-box table{
-  color: #FFA500 !important;
-  margin-top: 20px;
-}
-.highlighted-box th, td{
-  text-align: left;
-  border-bottom: 2px solid #000000;
-  padding: 7px;
-}
 /* tr:hover {background-color:#00BFFF;} */
-.circle-border {
-    display: inline-block;
-    -webkit-border-radius: 500px;
-    -moz-border-radius: 500px;
-    border-radius: 500px;
-    -khtml-border-radius: 500px;
-    border: 3px solid #fff;
-}
-.left-align {
-    text-align:left;
-}
-.right-align {
-    text-align:left;
-}
-.error {
-    color: #CF0000;
-    display: none;
-}
-.invisible {
-    display:none;
-    visibility:visible;
-}
-.triangle {
-    margin: 0 auto;
-    text-align:center;
-    width: 0 auto;
-    height: 0;
-    border-top: 30px solid #181A1C;
-    border-left: 585px outset transparent;
-    border-right: 585px outset transparent;
-    position: relative;
-}
-/*
-2.2 Buttons - There are buttons on a transparent background, primary and secondary color background.
-**********/
- .button,  .button:visited, .button:focus {
-    display:inline-block;
-    border:1px solid #181A1C;
-    color:#181A1C;
-    background-color:transparent;
-    padding:15px 30px;
-    font-size:17px;
-    line-height:auto;
-}
-.button:hover, .button:active{
-    background-color:#181A1C;
-    color:#fff;
-}
-.button-sp, .button-sp:visited, .button-sp:focus {
-    border:none;
-    background-color:#FECE1A;
-    color:#181A1C;
-}
-.button-sp:hover, .button-sp:active {
-    background-color:#181A1C;
-    color:#FECE1A;
-}
-.button-ps, .button-ps:visited, .button-ps:focus {
-    border:none;
-    background-color:#181A1C;
-    color:#FECE1A;
-}
-.button-ps:hover, .button-ps:active {
-    background-color:#FECE1A;
-    color:#181A1C;
-}
-
-
-
 /*
 3. Sections
 ***************************************************************************/
@@ -578,30 +480,6 @@ p {
     background-size: 800px 600px;
 }
 
-.primary-section-organisers .service p,
-.primary-section-organisers .service2 p,
-.primary-section-organisers .service2exec p,
-.primary-section-organisers .service2my p{
-  color: #d9ff66;
-  text-shadow: 1px 1.5px 1px black;
-}
-
-.primary-section-organisers .title{
-  margin-top: 100px;
-  margin-bottom: 10px;
-}
-.primary-section-organisers .orgcomm{
-  margin-top: 20px;
-}
-
-.primary-section-organisers {
-    /* background:#1E90FF; */
-
-    background: radial-gradient(#003cb3, #00ff80);
-    /* background-image: url(../backimplink.jpg);
-    background-repeat: no-repeat; */
-    /* background-size: 2000px 900px; */
-}
 .primary-section .triangle {
     border-top: 40px solid 	#000080;
 }
@@ -831,6 +709,9 @@ a.nav-link.active:hover {
     line-height: 1;
     text-align: left;
     font-family: "Arial Narrow", Arial, sans-serif;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
 }
 .footer p {
     color:lightgrey;
@@ -844,26 +725,7 @@ a.nav-link.active:hover {
 .footer a:hover, .footer a:focus{
     text-decoration: underline;
 }
-.scrollup {
-    text-align:center;
-    cursor:pointer;
-    vertical-align:middle;
-    width:39px;
-    height:39px;
-    border-radius:5px;
-    font-size:20px;
-    position:fixed;
-    bottom:30px;
-    right:20px;
-	border:1px solid #fff;
-    /* display:none; */
-    background: #FECE1A;
-}
-.scrollup > a {
-    position:relative;
-    top:7px;
-    color:#fff;
-}
+
 /*
 4 Responsible
 ********************************************************************/
