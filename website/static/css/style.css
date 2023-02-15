@@ -91,39 +91,25 @@ p {
 /*
 3. Footer
 ********************************************************************/
-
-
-html, body {
-    height: 100%;
-  }
-  
-  .wrapper {
-    min-height: 100%;
-    margin-bottom: -50px;
-  }
-  
-  .footer, .push {
-    height: 50px;
-  }
-  
-  .footer {
-    background-color: black;
+ .footer {
     box-shadow: 0px -5px 10px 0px #ffd700;
-    font-family: "Arial Narrow", Arial, sans-serif;
+    background-color: black;
     line-height: 1;
     text-align: left;
-    position: relative;
+    font-family: "Arial Narrow", Arial, sans-serif;
+    position: absolute;
+    bottom: 0;
     width: 100%;
-    margin-top: auto;
-  }
-  
-  
-  .footer p {
-    color: lightgrey;
-    margin: 0;
-  }
-  
-  .footer a {
-    color: #FECE1A;
-  }
+}
+.footer p {
+    color:lightgrey;
+    margin:0;
+}
 
+.footer a{
+    color:#FECE1A;
+}
+
+.footer-signup {
+    position: absolute;
+  }
