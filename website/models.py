@@ -10,9 +10,9 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(150), unique=True, index=True)
     password = db.Column(db.String(255))
     first_name = db.Column(db.String(25))
-    # role_id = db.Column(db.Integer, db.ForeignKey(Role.id))
     role_id = db.Column(db.Integer, db.ForeignKey('role.id'))
     role = db.relationship('Role', backref=db.backref('users', lazy=True))
+    role_approved = db.Column(db.Boolean, default=False)
 
 class Account(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)

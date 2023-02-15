@@ -42,7 +42,18 @@
           placeholder="Confirm password"
         />
       </div>
-      <br />
+      <div class="form-group">
+        <label for="role">Select Role</label>
+        <select class="form-control" id="role" name="role">
+          <option value="student">Student</option>
+          <option value="teacher">Teacher</option>
+        </select>
+      </div>
       <button type="submit" class="btn btn-primary">Submit</button>
     </form>
+    <style>
+      .sign_up {
+    margin-bottom: 50px;
+  }
+    </style>
     {% endblock %}

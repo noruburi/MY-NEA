@@ -67,6 +67,7 @@ p {
     box-shadow: none;
 }
 
+
 /*
 2. Sections
 ***************************************************************************/
@@ -89,7 +90,7 @@ p {
 /*
 3. Footer
 ********************************************************************/
- .footer {
+ /* .footer {
     box-shadow: 0px -5px 10px 0px #ffd700;
     background-color: black;
     line-height: 1;
@@ -106,7 +107,30 @@ p {
 
 .footer a{
     color:#FECE1A;
-}
+} */
 
-
-
+body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+  }
+  
+  .footer {
+    box-shadow: 0px -5px 10px 0px #ffd700;
+    background-color: black;
+    line-height: 1;
+    text-align: left;
+    font-family: "Arial Narrow", Arial, sans-serif;
+    position: relative;
+    width: 100%;
+    margin-top: 50px;
+  }
+  
+  .footer p {
+    color: lightgrey;
+    margin: 0;
+  }
+  
+  .footer a {
+    color: #FECE1A;
+  }
