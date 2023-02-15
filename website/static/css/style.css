@@ -87,44 +87,36 @@ p {
   color:white;
 }
 
+
 /*
 3. Footer
 ********************************************************************/
- /* .footer {
-    box-shadow: 0px -5px 10px 0px #ffd700;
-    background-color: black;
-    line-height: 1;
-    text-align: left;
-    font-family: "Arial Narrow", Arial, sans-serif;
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-}
-.footer p {
-    color:lightgrey;
-    margin:0;
-}
 
-.footer a{
-    color:#FECE1A;
-} */
 
-body {
-    margin: 0;
-    padding: 0;
-    min-height: 100vh;
+html, body {
+    height: 100%;
+  }
+  
+  .wrapper {
+    min-height: 100%;
+    margin-bottom: -50px;
+  }
+  
+  .footer, .push {
+    height: 50px;
   }
   
   .footer {
-    box-shadow: 0px -5px 10px 0px #ffd700;
     background-color: black;
+    box-shadow: 0px -5px 10px 0px #ffd700;
+    font-family: "Arial Narrow", Arial, sans-serif;
     line-height: 1;
     text-align: left;
-    font-family: "Arial Narrow", Arial, sans-serif;
     position: relative;
     width: 100%;
-    margin-top: 50px;
+    margin-top: auto;
   }
+  
   
   .footer p {
     color: lightgrey;
@@ -134,3 +126,4 @@ body {
   .footer a {
     color: #FECE1A;
   }
+

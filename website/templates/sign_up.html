@@ -1,6 +1,7 @@
-{% extends "base.html" %} {% block title %}Sign Up{% endblock %} {% block
-    content %}
-    <form method="POST">
+{% extends "base.html" %}
+{% block title %}Sign Up{% endblock %}
+{% block content %}
+    <form method="POST" class="sign-up-form">
       <h3 align="center">Sign Up</h3>
       <div class="form-group">
         <label for="email">Email Address</label>
@@ -51,9 +52,8 @@
       </div>
       <button type="submit" class="btn btn-primary">Submit</button>
     </form>
-    <style>
-      .sign_up {
-    margin-bottom: 50px;
-  }
-    </style>
-    {% endblock %}
+{% endblock %}
+
+
+
+
