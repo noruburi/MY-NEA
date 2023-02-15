@@ -35,14 +35,6 @@ def create_app():
         return User.query.get(int(id))
 
 
-    # @app.before_first_request
-    # def create_admin_user():
-    #     admin = User.query.filter_by(email='admin@Kimberley.com').first()
-    #     if not admin:
-    #         admin = User(email='admin@Kimberley.com', password=generate_password_hash('secret', method='sha256'), first_name='Admin', role='admin')
-    #         db.session.add(admin)
-    #         db.session.commit()
-
 
     @app.before_first_request
     def create_admin_user():
@@ -67,4 +59,9 @@ def create_database(app):
         db.create_all(app=app)
         print('create_database')
 
+def recreate_database(app):
+    with app.app_context():
+        db.drop_all()
+        db.create_all()
+        print('Database recreated')
 

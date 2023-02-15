@@ -64,6 +64,28 @@
   </div>
 </body>
 </html>
+<h2>Teacher Role Requests</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Email</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for user in teacher_requests %}
+      <tr>
+        <td>{{ user.email }}</td>
+        <td>
+          <form method="POST" action="{{ url_for('auth.approve_teacher_request', user_id=user.id) }}">
+            {{ csrf_token() }}
+            <button type="submit" class="btn btn-primary">Approve</button>
+          </form>
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
 
 {% endblock %}
 
