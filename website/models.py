@@ -16,7 +16,6 @@ class User(db.Model, UserMixin):
 
 class Account(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
-    type = db.Column(db.Integer)
     balance = db.Column(db.Integer)
 
 class Transactions(db.Model, UserMixin):
