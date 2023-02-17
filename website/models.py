@@ -13,6 +13,7 @@ class User(db.Model, UserMixin):
     role_id = db.Column(db.Integer, db.ForeignKey('role.id'))
     role = db.relationship('Role', backref=db.backref('users', lazy=True))
     role_approved = db.Column(db.Boolean, default=False)
+    role_request = db.Column(db.Boolean, default=False)
 
 class Account(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)

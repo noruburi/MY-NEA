@@ -45,8 +45,30 @@ def login():
 @auth.route('/admin')
 def admin_page():
     transactions = db.session.query(Transactions).all()
-    teacher_requests = User.query.join(Role).filter(Role.name == 'teacher', User.role_approved == False).all()
+    # teacher_requests = User.query.join(Role).filter(Role.name == 'teacher', User.role_approved == False).all()
+    teacher_requests = User.query.filter(User.role.has(name='teacher'), User.role_request==True).all()
     return render_template('admin.html',user=current_user,transactions=transactions,teacher_requests=teacher_requests)
+
+
+
+@auth.route('/approve-teacher-request/<int:user_id>', methods=['POST'])
+@login_required
+def approve_teacher_request(user_id):
+    user = User.query.get(user_id)
+    if user is None:
+        flash('User not found', 'error')
+        return redirect(url_for('auth.admin_page'))
+
+    if user.role.name != 'teacher':
+        flash('User is not a teacher', 'error')
+        return redirect(url_for('auth.admin_page'))
+
+    user.role_approved = True
+    db.session.add(user)
+    db.session.commit()
+
+    flash(f'Teacher request approved for {user.email}', 'success')
+    return redirect(url_for('auth.admin_page'))
 
 
 
@@ -88,9 +110,8 @@ def sign_up():
         firstName = request.form.get('firstName')
         password1 = request.form.get('password1')
         password2 = request.form.get('password2')
+        role_name = request.form.get('role')
 
-        # if user:
-        #     flash('Email already exists.', category='error')
         if len(email) < 4:
             flash('Email must be greater than 3 characters.', category='error')
         elif len(firstName) < 2:
@@ -107,10 +128,16 @@ def sign_up():
                 flash(message, category='error')
             else:
                 new_user = User(email=email, first_name=firstName, password=generate_password_hash(password1, method='sha256'))
+
+                # Create a new Role object and associate it with the new user
+                if role_name == 'student':
+                    new_user.role = Role.query.filter_by(name='student').first()
+                else:
+                    new_user.role_request = True
+                    new_user.role = Role.query.filter_by(name='teacher').first()
                 db.session.add(new_user)
                 db.session.commit()
                 flash('account created !', category='success')
                 return redirect(url_for('views.home'))
+    return render_template('signup.html', user=current_user)
 
-
-    return render_template("sign_up.html", user=current_user)

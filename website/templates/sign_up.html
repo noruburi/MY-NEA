@@ -50,6 +50,7 @@
           <option value="teacher">Teacher</option>
         </select>
       </div>
+      <input type="hidden" name="role_request" value="{% if role == 'teacher' %}True{% else %}False{% endif %}">
       <button type="submit" class="btn btn-primary">Submit</button>
     </form>
     <div class="footer footer-signup footer-relative">
