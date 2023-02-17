@@ -45,7 +45,7 @@ def login():
 @auth.route('/admin')
 def admin_page():
     transactions = db.session.query(Transactions).all()
-    teacher_requests = User.query.join(Role).filter(Role.name == 'teacher', User.role_approved == True).all()
+    teacher_requests = User.query.join(Role).filter(Role.name == 'teacher', User.role_approved == False).all()
     return render_template('admin.html',user=current_user,transactions=transactions,teacher_requests=teacher_requests)
 
 
