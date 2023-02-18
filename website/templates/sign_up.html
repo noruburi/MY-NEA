@@ -45,15 +45,15 @@
       </div>
       <div class="form-group">
         <label for="role">Select Role</label>
-        <select class="form-control" id="role" name="role">
-          <option value="student">Student</option>
-          <option value="teacher">Teacher</option>
+        <select class="form-control" id="role" name="is_teacher">
+            <option value="student">Student</option>
+            <option value="teacher">Teacher</option>
         </select>
-      </div>
-      <input type="hidden" name="role_request" value="{% if role == 'teacher' %}True{% else %}False{% endif %}">
-      <button type="submit" class="btn btn-primary">Submit</button>
-    </form>
-    <div class="footer footer-signup footer-relative">
+        {% if is_teacher %}
+        <input type="hidden" name="role_request" value="True">
+        {% endif %}
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
   </div>
 {% endblock %}
 
