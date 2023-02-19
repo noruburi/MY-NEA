@@ -128,12 +128,16 @@ def sign_up():
                 if role is None:
                     flash('Invalid role selected', category='error')
                     return redirect(url_for('auth.sign_up'))
-                new_user = User(email=email, first_name=firstName, password=generate_password_hash(password1, method='sha256'), role=role)
-                if role.name == 'Teacher':
-                    new_user.role_request = True
+
+                role_request = False
+                if role.name == 'teacher':
+                    role_request = True
+
+                new_user = User(email=email, first_name=firstName, password=generate_password_hash(password1, method='sha256'), role=role, role_request=role_request)
                 db.session.add(new_user)
                 db.session.commit()
-                flash('account created !', category='success')
+
+                flash('Account created!', category='success')
                 login_user(new_user)
                 return redirect(url_for('views.home'))
 
