@@ -44,31 +44,28 @@ def login():
 
 @auth.route('/admin')
 def admin_page():
+    # Get all transactions
     transactions = db.session.query(Transactions).all()
-    # teacher_requests = User.query.join(Role).filter(Role.name == 'teacher', User.role_approved == False).all()
+
+    # Get all pending teacher requests
     teacher_requests = User.query.filter(User.role.has(name='teacher'), User.role_request==True).all()
-    return render_template('admin.html',user=current_user,transactions=transactions,teacher_requests=teacher_requests)
+
+    # Render the admin page and pass in the transactions and teacher_requests
+    return render_template('admin.html', user=current_user, transactions=transactions, teacher_requests=teacher_requests)
 
 
 
-@auth.route('/approve-teacher-request/<int:user_id>', methods=['POST'])
+@auth.route('/approve_teacher_request/<int:user_id>', methods=['POST'])
 @login_required
 def approve_teacher_request(user_id):
     user = User.query.get(user_id)
-    if user is None:
-        flash('User not found', 'error')
-        return redirect(url_for('auth.admin_page'))
 
-    if user.role.name != 'teacher':
-        flash('User is not a teacher', 'error')
-        return redirect(url_for('auth.admin_page'))
+    if user:
+        user.role_approved = True
+        user.role_request = False
+        db.session.commit()
 
-    user.role_approved = True
-    db.session.add(user)
-    db.session.commit()
-
-    flash(f'Teacher request approved for {user.email}', 'success')
-    return redirect(url_for('auth.admin_page'))
+    return redirect(url_for('auth.admin'))
 
 
 
@@ -110,8 +107,7 @@ def sign_up():
         firstName = request.form.get('firstName')
         password1 = request.form.get('password1')
         password2 = request.form.get('password2')
-        role_request = request.form.get('role_request') == 'True'
-        is_teacher = request.form.get('is_teacher') == 'teacher'
+        role = request.form.get('role')
 
         if len(email) < 4:
             flash('Email must be greater than 3 characters.', category='error')
@@ -128,14 +124,21 @@ def sign_up():
             if score < 4:
                 flash(message, category='error')
             else:
-                role = Role.query.filter_by(name='teacher' if is_teacher else 'student').first()
+                role = Role.query.filter_by(name=role).first()
+                if role is None:
+                    flash('Invalid role selected', category='error')
+                    return redirect(url_for('auth.sign_up'))
                 new_user = User(email=email, first_name=firstName, password=generate_password_hash(password1, method='sha256'), role=role)
+                if role.name == 'Teacher':
+                    new_user.role_request = True
                 db.session.add(new_user)
                 db.session.commit()
-                flash('Account created!', category='success')
+                flash('account created !', category='success')
+                login_user(new_user)
                 return redirect(url_for('views.home'))
 
-    return render_template('sign_up.html', user=current_user)
+    roles = Role.query.all()
+    return render_template("sign_up.html", user=current_user, roles=roles)
 
 
 # @auth.route('/sign_up', methods=['GET', 'POST'])
