@@ -65,7 +65,8 @@
   </div>
 
   <div class="container">
-    <h1>Teacher Role Requests</h1>
+    <h1>Admin Page</h1>
+    <h2>Pending Teacher Requests</h2>
     <table>
       <thead>
         <tr>
@@ -74,12 +75,12 @@
         </tr>
       </thead>
       <tbody>
-        {% for user in role_request %}
+        {% for user in teacher_requests %}
           <tr>
             <td>{{ user.email }}</td>
             <td>
               <form method="POST" action="{{ url_for('auth.approve_teacher_request', user_id=user.id) }}">
-                {{ csrf_token() }}
+                {{ wtf.csrf_token() }}
                 <button type="submit" class="btn btn-primary">Approve</button>
               </form>
             </td>
