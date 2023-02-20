@@ -107,7 +107,7 @@ def sign_up():
         firstName = request.form.get('firstName')
         password1 = request.form.get('password1')
         password2 = request.form.get('password2')
-        role = request.form.get('role')
+        role = request.form.get('role') #student or teacher
 
         if len(email) < 4:
             flash('Email must be greater than 3 characters.', category='error')
@@ -129,7 +129,8 @@ def sign_up():
                     flash('Invalid role selected', category='error')
                     return redirect(url_for('auth.sign_up'))
 
-                role_request = request.form.get('role_request') == 'True'
+                role_request = request.form.get('role') == 'teacher'
+                print(role_request)
 
                 new_user = User(email=email,first_name=firstName,password=generate_password_hash(password1, method='sha256'),role=role,role_request=role_request)
                 db.session.add(new_user)
