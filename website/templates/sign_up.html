@@ -46,14 +46,12 @@
       <div class="form-group">
         <label for="role">Select Role</label>
         <select class="form-control" id="role" name="role">
-          <option value="student">Student</option>
-          <option value="teacher">Teacher</option>
+            <option value="student">Student</option>
+            <option value="teacher">Teacher</option>
         </select>
-        {% if role == 'teacher' %}
-          <input type="hidden" name="role_request" value="True">
-        {% endif %}
-      </div>
-      <button type="submit" class="btn btn-primary">Submit</button>
+    </div>
+    <input type="hidden" name="role_request" value="True">
+    <button type="submit" class="btn btn-primary">Submit</button>
   </div>
 {% endblock %}
 

@@ -5,9 +5,6 @@ class Role(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(25), unique=True)
 
-    def __repr__(self):
-        return self.name
-
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(150), unique=True, index=True)
@@ -17,7 +14,6 @@ class User(db.Model, UserMixin):
     role = db.relationship('Role', backref=db.backref('users', lazy=True))
     role_approved = db.Column(db.Boolean, default=False)
     role_request = db.Column(db.Boolean, default=False)
-    role_selection = db.Column(db.String(10))
 
 class Account(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
