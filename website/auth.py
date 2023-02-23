@@ -55,18 +55,35 @@ def admin_page():
 
 
 
-@auth.route('/approve_teacher_request/<int:user_id>', methods=['POST'])
+@auth.route('/admin/update-teacher-request/<int:user_id>', methods=['POST'])
 @login_required
-def approve_teacher_request(user_id):
+def update_teacher_request(user_id):
+    # Get the user from the database
     user = User.query.get(user_id)
 
-    if user:
+    # Check if the user exists and has requested the teacher role
+    if user is None or not user.role_request or user.role.name != 'teacher':
+        flash('Invalid request.', 'error')
+        return redirect(url_for('auth.admin_page'))
+
+    # Check if the current user is authorized to approve or reject teacher requests
+    if not current_user.is_admin():
+        flash('You are not authorized to approve or reject teacher requests.', 'error')
+        return redirect(url_for('auth.admin_page'))
+
+    # Process the request
+    action = request.form['action']
+    if action == 'approve':
         user.role_approved = True
         user.role_request = False
         db.session.commit()
+        flash(f'Teacher role request for {user.email} has been approved.', 'success')
+    elif action == 'reject':
+        db.session.delete(user)
+        db.session.commit()
+        flash(f'Teacher role request for {user.email} has been rejected.', 'success')
 
-    return redirect(url_for('auth.admin'))
-
+    return redirect(url_for('auth.admin_page'))
 
 
 @auth.route('/logout')
