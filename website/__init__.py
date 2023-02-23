@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from os import path
 from flask_login import LoginManager
 from werkzeug.security import generate_password_hash
-from flask_migrate import Migrate
+
 
 db = SQLAlchemy()
 DB_NAME = "database.db"
@@ -18,7 +18,6 @@ def create_app():
     login_manager.login_view = 'auth.landing'
     login_manager.init_app(app)
     login_manager.login_message_category = 'info'
-    migrate = Migrate(app, db)
     @login_manager.user_loader
     def load_user(id):
         return User.query.get(int(id))
