@@ -1,9 +1,10 @@
-from flask import Blueprint, render_template, request, flash, redirect, url_for, session
-from .models import User
-from werkzeug.security import generate_password_hash, check_password_hash
-from . import db   #means from __init__.py import db
-from .models import Transactions, Role  
-from flask_login import login_user, login_required, logout_user, current_user
+from flask import Blueprint, render_template, request, flash, redirect, url_for
+from flask_login import login_user, current_user, logout_user, login_required
+from werkzeug.security import check_password_hash, generate_password_hash
+from .forms import LoginForm  # Import the LoginForm class from auth/forms.py
+from .models import User, Role
+from . import db
+
 
 
 auth = Blueprint('auth', __name__) #defines auth blueprint to create url
@@ -16,41 +17,34 @@ def landing():
 
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
-    if current_user.is_authenticated:
-        return redirect(url_for('views.home'))
-        
-    form = LoginForm()
+    form = LoginForm()  # Create an instance of the LoginForm class
     
-    if form.validate_on_submit():
-        email = form.email.data
-        password = form.password.data
-
-        user = User.query.filter_by(email=email).first()
-        if user and check_password_hash(user.password, password):
-            role = user.role
-            if role.name == "admin":
+    if form.validate_on_submit():  # Check if the form is valid
+        user = User.query.filter_by(email=form.email.data).first()  # Get the user from the database
+        
+        if user and check_password_hash(user.password, form.password.data):  # Check if the user exists and the password is correct
+            login_user(user, remember=form.remember.data)  # Log the user in and remember the user's session if "Remember me" is checked
+            
+            if user.role.name == "admin":
                 flash('Logged in as admin successfully!', category='success')
                 return redirect(url_for('auth.admin_page'))
-            elif role.name == "teacher":
+            elif user.role.name == "teacher":
                 if not user.is_approved:
                     flash('Teacher role not approved yet.', category='error')
                     return redirect(url_for('auth.login'))
-            elif role.name == "student":
+            elif user.role.name == "student":
                 flash('Logged in as student successfully!', category='success')
-                
-            remember = form.remember.data
-            login_user(user, remember=remember)
-            return redirect(url_for('views.home'))
+                return redirect(url_for('views.home'))
         else:
-            flash('Login failed. Check email and password.', category='error')
-            
-    return render_template('login.html', form=form)
+            flash('Incorrect email or password.', category='error')
+    
+    return render_template('login.html', form=form, user=current_user)
 
 
 @auth.route('/admin')
 def admin_page():
     # Get all transactions
-    transactions = db.session.query(Transactions).all()
+    # transactions = db.session.query(Transactions).all()
 
     # Get all pending teacher requests
     teacher_requests = User.query.filter(User.role.has(name='teacher'), User.role_request==True).all()
