@@ -11,7 +11,7 @@ DB_NAME = "database.db"
 def create_app():
     app = Flask(__name__)
     app.config['SECRET_KEY'] = 'hjshjhdjah kjshkjdhjs'
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + DB_NAME  #store database inside the directory of the init.py files
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + DB_NAME  #store database inside the directory of the init.py file
     db.init_app(app)
 
     login_manager = LoginManager()

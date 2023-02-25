@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, flash, redirect, url_for
+from flask import Blueprint, render_template, request, flash, redirect, url_for, session
 from .models import User
 from werkzeug.security import generate_password_hash, check_password_hash
 from . import db   #means from __init__.py import db
@@ -16,31 +16,36 @@ def landing():
 
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
-    if request.method == 'POST':
-        email = request.form.get('email')
-        password = request.form.get('password')
+    if current_user.is_authenticated:
+        return redirect(url_for('views.home'))
+        
+    form = LoginForm()
+    
+    if form.validate_on_submit():
+        email = form.email.data
+        password = form.password.data
 
         user = User.query.filter_by(email=email).first()
-        if user:
-            if check_password_hash(user.password, password):
-                role = user.role
-                if role.name == "admin":
-                    flash('Logged in as admin successfully!', category='success')
-                    return redirect(url_for('auth.admin_page'))
-                elif role.name == "teacher":
-                    if not user.is_approved:
-                        flash('Teacher role not approved yet.', category='error')
-                        return redirect(url_for('auth.login'))
-                elif role.name == "student":
-                    flash('Logged in as student successfully!', category='success')
-                login_user(user, remember=True)
-                return redirect(url_for('views.home'))
-            else:
-                flash('Incorrect password, try again.', category='error')
+        if user and check_password_hash(user.password, password):
+            role = user.role
+            if role.name == "admin":
+                flash('Logged in as admin successfully!', category='success')
+                return redirect(url_for('auth.admin_page'))
+            elif role.name == "teacher":
+                if not user.is_approved:
+                    flash('Teacher role not approved yet.', category='error')
+                    return redirect(url_for('auth.login'))
+            elif role.name == "student":
+                flash('Logged in as student successfully!', category='success')
+                
+            remember = form.remember.data
+            login_user(user, remember=remember)
+            return redirect(url_for('views.home'))
         else:
-            flash('Email does not exist.', category='error')
+            flash('Login failed. Check email and password.', category='error')
+            
+    return render_template('login.html', form=form)
 
-    return render_template('login.html',user=current_user)
 
 @auth.route('/admin')
 def admin_page():
@@ -55,10 +60,11 @@ def admin_page():
 
 
 
-@auth.route('/admin/update-teacher-request/<int:user_id>', methods=['POST'])
+@auth.route('/admin/update-teacher-request', methods=['POST'])
 @login_required
-def update_teacher_request(user_id):
+def update_teacher_request():
     # Get the user from the database
+    user_id = request.form['user_id']
     user = User.query.get(user_id)
 
     # Check if the user exists and has requested the teacher role
@@ -84,7 +90,6 @@ def update_teacher_request(user_id):
         flash(f'Teacher role request for {user.email} has been rejected.', 'success')
 
     return redirect(url_for('auth.admin_page'))
-
 
 @auth.route('/logout')
 @login_required
