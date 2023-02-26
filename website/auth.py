@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for
 from flask_login import login_user, current_user, logout_user, login_required
 from werkzeug.security import check_password_hash, generate_password_hash
-from .models import User, Role, Transactions, TeacherRequest
+from .models import User, Role, Transactions, TeacherRequestHistory
 from . import db
 from sqlalchemy.exc import IntegrityError
 
@@ -61,12 +61,10 @@ def admin_page():
 @auth.route('/admin/update-teacher-request', methods=['POST'])
 @login_required
 def update_teacher_request():
-    print("Update teacher request function called")
     # Get the user from the database
     user_id = request.form['user_id']
     user = User.query.get(user_id)
-    print("User:", user)
-    print("Current User:", current_user)
+
     # Check if the user exists and has requested the teacher role
     if user is None or not user.role_request or user.role.name != 'teacher':
         flash('Invalid request.', 'error')
@@ -79,24 +77,50 @@ def update_teacher_request():
 
     # Process the request
     action = request.form['action']
-    print("Action:", action)
     if action == 'approve':
         user.role_approved = True
         user.role_request = False
         db.session.commit()
         flash(f'Teacher role request for {user.email} has been approved.', 'success')
+        
+        # Create a new TeacherRequestHistory record for the approval
+        teacher_request = TeacherRequestHistory(
+            user_id=user.id,
+            status='accepted',
+            date_requested=user.role_requested_on,
+            date_resolved=datetime.utcnow(),
+            resolved_by_id=current_user.id
+        )
+        db.session.add(teacher_request)
+        db.session.commit()
+
     elif action == 'reject':
         db.session.delete(user)
         db.session.commit()
         flash(f'Teacher role request for {user.email} has been rejected.', 'success')
+        
+        # Create a new TeacherRequestHistory record for the rejection
+        teacher_request = TeacherRequestHistory(
+            user_id=user.id,
+            status='rejected',
+            date_requested=user.role_requested_on,
+            date_resolved=datetime.utcnow(),
+            resolved_by_id=current_user.id
+        )
+        db.session.add(teacher_request)
+        db.session.commit()
 
     return redirect(url_for('auth.admin_page'))
 
-@auth.route('/teacher_requests')
+
+
+
+@auth.route('/teacher_requests_history')
 @login_required
 def view_teacher_requests():
-    requests = TeacherRequest.query.all()
-    return render_template('teacher_requests.html', requests=requests,user=current_user)
+    requests = TeacherRequestHistory.query.order_by(TeacherRequestHistory.date_requested.desc()).all()
+    return render_template('teacher_requests_history.html', requests=requests, user=current_user)
+
 
 @auth.route('/logout')
 @login_required
