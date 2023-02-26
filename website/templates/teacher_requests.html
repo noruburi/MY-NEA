@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Teacher Requests{% endblock %}
+
+{% block content %}
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Page</title>
+ 
+
+
+    {% block content %}
+    <h1>Teacher Requests</h1>
+  <div class="container">
+    {% for request in requests %}
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">{{ request.user.first_name }} {{ request.user.last_name }}</h5>
+          <p class="card-text">Status: {{ request.status }}</p>
+          <p class="card-text">Date requested: {{ request.date_requested }}</p>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+  {% endblock %}

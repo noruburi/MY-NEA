@@ -61,7 +61,6 @@ def admin_page():
 @auth.route('/admin/update-teacher-request', methods=['POST'])
 @login_required
 def update_teacher_request():
-    requests = TeacherRequest.query.all()
     print("Update teacher request function called")
     # Get the user from the database
     user_id = request.form['user_id']
@@ -92,6 +91,12 @@ def update_teacher_request():
         flash(f'Teacher role request for {user.email} has been rejected.', 'success')
 
     return redirect(url_for('auth.admin_page'))
+
+@auth.route('/teacher_requests')
+@login_required
+def view_teacher_requests():
+    requests = TeacherRequest.query.all()
+    return render_template('teacher_requests.html', requests=requests)
 
 @auth.route('/logout')
 @login_required
