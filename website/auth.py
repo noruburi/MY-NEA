@@ -1,10 +1,9 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for
 from flask_login import login_user, current_user, logout_user, login_required
 from werkzeug.security import check_password_hash, generate_password_hash
-from .forms import LoginForm  # Import the LoginForm class from auth/forms.py
 from .models import User, Role, Transactions
 from . import db
-
+from sqlalchemy.exc import IntegrityError
 
 
 auth = Blueprint('auth', __name__) #defines auth blueprint to create url
@@ -29,10 +28,11 @@ def login():
                     login_user(user, remember=True)
                     return redirect(url_for('auth.admin_page'))
                 elif role.name == "teacher":
-                    if not user.is_approved:
+                    if not user.role_approved:
                         flash('Teacher role not approved yet.', category='error')
-                        login_user(user, remember=True)
                         return redirect(url_for('auth.login'))
+                    else:
+                        flash('Logged in as teacher successfully!', category='success')
                 elif role.name == "student":
                     flash('Logged in as student successfully!', category='success')
                 login_user(user, remember=True)
@@ -42,8 +42,7 @@ def login():
         else:
             flash('Email does not exist.', category='error')
 
-    return render_template('login.html',user=current_user)
-
+    return render_template('login.html', user=current_user)
 
 
 @auth.route('/admin')
@@ -157,8 +156,13 @@ def sign_up():
                 print(role_request)
 
                 new_user = User(email=email,first_name=firstName,password=generate_password_hash(password1, method='sha256'),role=role,role_request=role_request)
-                db.session.add(new_user)
-                db.session.commit()
+                try:
+                    db.session.add(new_user)
+                    db.session.commit()
+                except IntegrityError:
+                    db.session.rollback()
+                    flash('Email address already exists', category='error')
+                    return redirect(url_for('auth.sign_up'))
 
                 flash('Account created!', category='success')
                 login_user(new_user)

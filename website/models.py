@@ -16,9 +16,8 @@ class User(db.Model, UserMixin):
     role_approved = db.Column(db.Boolean, default=False)
     role_request = db.Column(db.Boolean, default=False)
 
-    @property
-    def is_authenticated(self):
-        return True if self.role.name == 'admin' else self.role_approved
+    def is_admin(self):
+        return self.role.name == 'admin'
 
 class Account(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
