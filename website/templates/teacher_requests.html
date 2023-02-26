@@ -3,16 +3,7 @@
 {% block title %}Teacher Requests{% endblock %}
 
 {% block content %}
-
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Admin Page</title>
- 
-
-
-    {% block content %}
-    <h1>Teacher Requests</h1>
+  <h1>Teacher Requests</h1>
   <div class="container">
     {% for request in requests %}
       <div class="card">
@@ -20,9 +11,15 @@
           <h5 class="card-title">{{ request.user.first_name }} {{ request.user.last_name }}</h5>
           <p class="card-text">Status: {{ request.status }}</p>
           <p class="card-text">Date requested: {{ request.date_requested }}</p>
+          {% if request.status == "accepted" %}
+            <p class="card-text">Date accepted: {{ request.date_accepted }}</p>
+            <p class="card-text">Accepted by: {{ request.accepted_by.first_name }} {{ request.accepted_by.last_name }}</p>
+          {% elif request.status == "rejected" %}
+            <p class="card-text">Date rejected: {{ request.date_rejected }}</p>
+            <p class="card-text">Rejected by: {{ request.rejected_by.first_name }} {{ request.rejected_by.last_name }}</p>
+          {% endif %}
         </div>
       </div>
     {% endfor %}
   </div>
-
-  {% endblock %}
+{% endblock %}

@@ -96,7 +96,7 @@ def update_teacher_request():
 @login_required
 def view_teacher_requests():
     requests = TeacherRequest.query.all()
-    return render_template('teacher_requests.html', requests=requests)
+    return render_template('teacher_requests.html', requests=requests,user=current_user)
 
 @auth.route('/logout')
 @login_required
