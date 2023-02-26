@@ -34,10 +34,10 @@ class Transactions(db.Model, UserMixin):
     to_account_id = db.Column(db.Integer)
     amount = db.Column(db.Integer)
     
-class TeacherRequest(db.Model):
+class TeacherRequestHistory(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    user = db.relationship('User', foreign_keys=[user_id], backref=db.backref('teacher_requests', lazy=True))
+    user = db.relationship('User', foreign_keys=[user_id], backref=db.backref('teacher_requests_history', lazy=True))
     status = db.Column(db.String(20), nullable=False)
     date_requested = db.Column(db.DateTime, nullable=False)
     date_resolved = db.Column(db.DateTime)
@@ -45,4 +45,4 @@ class TeacherRequest(db.Model):
     resolved_by = db.relationship('User', foreign_keys=[resolved_by_id])
 
     def __repr__(self):
-        return f"<TeacherRequest {self.id}>"
+        return f"<TeacherRequestHistory {self.id}>"
