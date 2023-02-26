@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for
 from flask_login import login_user, current_user, logout_user, login_required
 from werkzeug.security import check_password_hash, generate_password_hash
-from .models import User, Role, Transactions
+from .models import User, Role, Transactions, TeacherRequest
 from . import db
 from sqlalchemy.exc import IntegrityError
 
@@ -61,6 +61,7 @@ def admin_page():
 @auth.route('/admin/update-teacher-request', methods=['POST'])
 @login_required
 def update_teacher_request():
+    requests = TeacherRequest.query.all()
     print("Update teacher request function called")
     # Get the user from the database
     user_id = request.form['user_id']
