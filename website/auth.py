@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, flash, redirect, url_for
 from flask_login import login_user, current_user, logout_user, login_required
 from werkzeug.security import check_password_hash, generate_password_hash
 from .forms import LoginForm  # Import the LoginForm class from auth/forms.py
-from .models import User, Role
+from .models import User, Role, Transactions
 from . import db
 
 
@@ -17,34 +17,39 @@ def landing():
 
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
-    form = LoginForm()  # Create an instance of the LoginForm class
-    
-    if form.validate_on_submit():  # Check if the form is valid
-        user = User.query.filter_by(email=form.email.data).first()  # Get the user from the database
-        
-        if user and check_password_hash(user.password, form.password.data):  # Check if the user exists and the password is correct
-            login_user(user, remember=form.remember.data)  # Log the user in and remember the user's session if "Remember me" is checked
-            
-            if user.role.name == "admin":
-                flash('Logged in as admin successfully!', category='success')
-                return redirect(url_for('auth.admin_page'))
-            elif user.role.name == "teacher":
-                if not user.is_approved:
-                    flash('Teacher role not approved yet.', category='error')
-                    return redirect(url_for('auth.login'))
-            elif user.role.name == "student":
-                flash('Logged in as student successfully!', category='success')
+    if request.method == 'POST':
+        email = request.form.get('email')
+        password = request.form.get('password')
+        user = User.query.filter_by(email=email).first()
+        if user:
+            if check_password_hash(user.password, password):
+                role = user.role
+                if role.name == "admin":
+                    flash('Logged in as admin successfully!', category='success')
+                    login_user(user, remember=True)
+                    return redirect(url_for('auth.admin_page'))
+                elif role.name == "teacher":
+                    if not user.is_approved:
+                        flash('Teacher role not approved yet.', category='error')
+                        login_user(user, remember=True)
+                        return redirect(url_for('auth.login'))
+                elif role.name == "student":
+                    flash('Logged in as student successfully!', category='success')
+                login_user(user, remember=True)
                 return redirect(url_for('views.home'))
+            else:
+                flash('Incorrect password, try again.', category='error')
         else:
-            flash('Incorrect email or password.', category='error')
-    
-    return render_template('login.html', form=form, user=current_user)
+            flash('Email does not exist.', category='error')
+
+    return render_template('login.html',user=current_user)
+
 
 
 @auth.route('/admin')
 def admin_page():
     # Get all transactions
-    # transactions = db.session.query(Transactions).all()
+    transactions = db.session.query(Transactions).all()
 
     # Get all pending teacher requests
     teacher_requests = User.query.filter(User.role.has(name='teacher'), User.role_request==True).all()
@@ -57,10 +62,12 @@ def admin_page():
 @auth.route('/admin/update-teacher-request', methods=['POST'])
 @login_required
 def update_teacher_request():
+    print("Update teacher request function called")
     # Get the user from the database
     user_id = request.form['user_id']
     user = User.query.get(user_id)
-
+    print("User:", user)
+    print("Current User:", current_user)
     # Check if the user exists and has requested the teacher role
     if user is None or not user.role_request or user.role.name != 'teacher':
         flash('Invalid request.', 'error')
@@ -73,6 +80,7 @@ def update_teacher_request():
 
     # Process the request
     action = request.form['action']
+    print("Action:", action)
     if action == 'approve':
         user.role_approved = True
         user.role_request = False

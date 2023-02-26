@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from os import path
-from flask_login import LoginManager
+from flask_login import LoginManager, login_user
 from werkzeug.security import generate_password_hash
 
 
@@ -15,7 +15,7 @@ def create_app():
     db.init_app(app)
 
     login_manager = LoginManager()
-    login_manager.login_view = 'auth.landing'
+    login_manager.login_view = 'auth.login'
     login_manager.init_app(app)
     login_manager.login_message_category = 'info'
     @login_manager.user_loader
@@ -40,7 +40,6 @@ def create_app():
             admin = User(email='admin@Kimberley.com', password=generate_password_hash('secret', method='sha256'), first_name='Admin', role_id=admin_role.id)
             db.session.add(admin)
             db.session.commit()
-
         db.session.commit()
 
     from .models import User, Role    
