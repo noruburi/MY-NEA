@@ -80,7 +80,7 @@ def update_teacher_request():
         flash(f'Teacher role request for {user.email} has been approved.', 'success')
         status = 'accepted'
     elif action == 'reject':
-        db.session.delete(user)
+        user.role_rejected = True
         db.session.commit()
         flash(f'Teacher role request for {user.email} has been rejected.', 'success')
         status = 'rejected'
