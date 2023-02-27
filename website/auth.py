@@ -185,6 +185,10 @@ def sign_up():
                     return redirect(url_for('auth.sign_up'))
                 
                 if role_request:
+                    # Create a new TeacherRequestHistory object with the user_id and status set to 'Pending'
+                    teacher_request = TeacherRequestHistory(user_id=current_user.id, status='Pending')
+                    db.session.add(teacher_request)
+                    db.session.commit()
                     flash('Teacher role request sent', category='success')
                     return redirect(url_for('views.home'))
                 else:

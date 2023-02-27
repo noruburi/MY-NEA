@@ -40,7 +40,6 @@ class TeacherRequestHistory(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     user = db.relationship('User', foreign_keys=[user_id], backref=db.backref('teacher_requests_history', lazy=True))
     status = db.Column(db.String(20), nullable=False)
-    date_requested = db.Column(db.DateTime, nullable=False)
     date_resolved = db.Column(db.DateTime)
     resolved_by_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     resolved_by = db.relationship('User', foreign_keys=[resolved_by_id])
