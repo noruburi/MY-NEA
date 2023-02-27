@@ -171,28 +171,30 @@ def sign_up():
                 if role is None:
                     flash('Invalid role selected', category='error')
                     return redirect(url_for('auth.sign_up'))
-
+                
                 role_request = request.form.get('role') == 'teacher'
+                print(role_request)
+
                 new_user = User(email=email,first_name=firstName,password=generate_password_hash(password1, method='sha256'),role=role,role_request=role_request, role_requested_on=datetime.now())
-                if User.query.filter_by(email = email).first() != None:
+                try:
+                    db.session.add(new_user)
+                    db.session.commit()
+                except IntegrityError:
                     db.session.rollback()
                     flash('Email address already exists', category='error')
                     return redirect(url_for('auth.sign_up'))
+                
+                if role_request:
+                    flash('Teacher role request sent', category='success')
+                    return redirect(url_for('views.home'))
                 else:
-                    db.session.add(new_user)
-                    db.session.commit()
-
-                    if role_request:
-                        flash('Teacher role request sent', category='success')
-                        return redirect(url_for('auth.teacher_role_request'))
-                    else:
-                        flash('Registration successful', category='success')
-                        return redirect(url_for('main.home'))
+                    flash('Registration successful', category='success')
+                    return redirect(url_for('views.home'))
+                    
 
     roles = Role.query.all()
     return render_template('sign_up.html',user=current_user, roles=roles)
 
-    roles = Role.query.all()
-    return render_template("sign_up.html", user=current_user, roles=roles)
+
 
 
