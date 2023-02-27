@@ -176,17 +176,22 @@ def sign_up():
                 print(role_request)
 
                 new_user = User(email=email,first_name=firstName,password=generate_password_hash(password1, method='sha256'),role=role,role_request=role_request)
-                try:
-                    db.session.add(new_user)
-                    db.session.commit()
-                except IntegrityError:
+                if User.query.filter_by(email = email).first() != None:
                     db.session.rollback()
                     flash('Email address already exists', category='error')
                     return redirect(url_for('auth.sign_up'))
+                else:
+                    db.session.add(new_user)
+                    db.session.commit()
 
-                flash('Account created!', category='success')
-                login_user(new_user)
-                return redirect(url_for('views.home'))
+                    return redirect(url_for('auth.sign_up'))
+
+                if role.name == "teacher":
+                    flash('Teacher role awaiting approval.', category='success')
+                    return redirect(url_for('auth.login'))
+                elif role.name == "student":
+                    flash('Logged in as student successfully!', category='success')
+                    login_user(user, remember=True)
 
     roles = Role.query.all()
     return render_template("sign_up.html", user=current_user, roles=roles)
