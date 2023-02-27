@@ -15,6 +15,7 @@ class User(db.Model, UserMixin):
     role = db.relationship('Role', backref=db.backref('users', lazy=True))
     role_approved = db.Column(db.Boolean, default=False)
     role_request = db.Column(db.Boolean, default=False)
+    role_requested_on = db.Column(db.DateTime) # add this line
 
     def is_admin(self):
         return self.role.name == 'admin'

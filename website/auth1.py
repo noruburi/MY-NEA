@@ -4,7 +4,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from .models import User, Role, Transactions, TeacherRequestHistory
 from . import db
 from sqlalchemy.exc import IntegrityError
-from datetime import datetime
+
 
 auth = Blueprint('auth', __name__) #defines auth blueprint to create url
 
@@ -61,44 +61,54 @@ def admin_page():
 @auth.route('/admin/update-teacher-request', methods=['POST'])
 @login_required
 def update_teacher_request():
+    # Get the user from the database
     user_id = request.form['user_id']
     user = User.query.get(user_id)
 
+    # Check if the user exists and has requested the teacher role
     if user is None or not user.role_request or user.role.name != 'teacher':
         flash('Invalid request.', 'error')
         return redirect(url_for('auth.admin_page'))
 
+    # Check if the current user is authorized to approve or reject teacher requests
     if not current_user.is_admin():
         flash('You are not authorized to approve or reject teacher requests.', 'error')
         return redirect(url_for('auth.admin_page'))
 
+    # Process the request
     action = request.form['action']
     if action == 'approve':
         user.role_approved = True
         user.role_request = False
         db.session.commit()
         flash(f'Teacher role request for {user.email} has been approved.', 'success')
-        status = 'accepted'
+        
+        # Create a new TeacherRequestHistory record for the approval
+        teacher_request = TeacherRequestHistory(
+            user_id=user.id,
+            status='accepted',
+            date_requested=user.role_requested_on,
+            date_resolved=datetime.utcnow(),
+            resolved_by_id=current_user.id
+        )
+        db.session.add(teacher_request)
+        db.session.commit()
+
     elif action == 'reject':
         db.session.delete(user)
         db.session.commit()
         flash(f'Teacher role request for {user.email} has been rejected.', 'success')
-        status = 'rejected'
-
-    # Add a check to see if date_requested is None, and set it to the current time if it is
-    date_requested = user.role_requested_on
-    if date_requested is None:
-        date_requested = datetime.utcnow()
-
-    history_entry = TeacherRequestHistory(
-        user=user,
-        status=status,
-        date_requested=date_requested,
-        date_resolved=datetime.utcnow(),
-        resolved_by=current_user
-    )
-    db.session.add(history_entry)
-    db.session.commit()
+        
+        # Create a new TeacherRequestHistory record for the rejection
+        teacher_request = TeacherRequestHistory(
+            user_id=user.id,
+            status='rejected',
+            date_requested=user.role_requested_on,
+            date_resolved=datetime.utcnow(),
+            resolved_by_id=current_user.id
+        )
+        db.session.add(teacher_request)
+        db.session.commit()
 
     return redirect(url_for('auth.admin_page'))
 
