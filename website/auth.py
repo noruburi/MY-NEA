@@ -184,7 +184,7 @@ def sign_up():
                     flash('Email address already exists', category='error')
                     return redirect(url_for('auth.sign_up'))
                 
-                if role_request:
+                if request.form.get('role') == 'teacher':
                     # Create a new TeacherRequestHistory object with the user_id and status set to 'Pending'
                     teacher_request = TeacherRequestHistory(user_id=current_user.id, status='Pending')
                     db.session.add(teacher_request)
