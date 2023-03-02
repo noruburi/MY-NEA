@@ -12,14 +12,14 @@
         <p class="card-text">Status: {{ request.status }}</p>
         <p class="card-text">Role requested on: {{ request.user.role_requested_on }}</p>
         {% if request.status == "accepted" %}
-          <p class="card-text">Date accepted: {{ request.date_accepted }}</p>
-          <p class="card-text">Accepted by: {{ request.accepted_by.first_name }} {{ request.accepted_by.last_name }}</p>
+          <p class="card-text">Date accepted: {{ request.date_resolved }}</p>
+          <p class="card-text">Accepted by: {{ request.resolved_by.first_name }} {{ request.resolved_by.last_name }}</p>
         {% elif request.status == "rejected" %}
-          <p class="card-text">Date rejected: {{ request.date_rejected }}</p>
-          <p class="card-text">Rejected by: {{ request.rejected_by.first_name }} {{ request.rejected_by.last_name }}</p>
+          <p class="card-text">Date rejected: {{ request.date_resolved }}</p>
+          <p class="card-text">Rejected by: {{ request.resolved_by.first_name }} {{ request.resolved_by.last_name }}</p>
         {% endif %}
       </div>
     </div>
-  {% endfor %}
+{% endfor %}
   </div>
 {% endblock %}

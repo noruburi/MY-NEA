@@ -87,13 +87,10 @@ def update_teacher_request():
 
     # Add a check to see if date_requested is None, and set it to the current time if it is
     date_requested = user.role_requested_on
-    if date_requested is None:
-        date_requested = datetime.utcnow()
 
     history_entry = TeacherRequestHistory(
         user=user,
         status=status,
-        date_requested=date_requested,
         date_resolved=datetime.utcnow(),
         resolved_by=current_user
     )
@@ -101,7 +98,6 @@ def update_teacher_request():
     db.session.commit()
 
     return redirect(url_for('auth.admin_page'))
-
 
 
 @auth.route('/teacher_requests_history')
