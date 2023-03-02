@@ -6,20 +6,20 @@
   <h1>Teacher Request History</h1>
   <div class="container">
     {% for request in requests %}
-      <div class="card">
-        <div class="card-body">
-          <h5 class="card-title">{{ request.user.first_name }} {{ request.user.last_name }}</h5>
-          <p class="card-text">Status: {{ request.status }}</p>
-          <p class="card-text">Date requested: {{ request.date_requested }}</p>
-          {% if request.status == "accepted" %}
-            <p class="card-text">Date accepted: {{ request.date_accepted }}</p>
-            <p class="card-text">Accepted by: {{ request.accepted_by.first_name }} {{ request.accepted_by.last_name }}</p>
-          {% elif request.status == "rejected" %}
-            <p class="card-text">Date rejected: {{ request.date_rejected }}</p>
-            <p class="card-text">Rejected by: {{ request.rejected_by.first_name }} {{ request.rejected_by.last_name }}</p>
-          {% endif %}
-        </div>
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">{{ request.user.first_name }} {{ request.user.last_name }}</h5>
+        <p class="card-text">Status: {{ request.status }}</p>
+        <p class="card-text">Role requested on: {{ request.user.role_requested_on }}</p>
+        {% if request.status == "accepted" %}
+          <p class="card-text">Date accepted: {{ request.date_accepted }}</p>
+          <p class="card-text">Accepted by: {{ request.accepted_by.first_name }} {{ request.accepted_by.last_name }}</p>
+        {% elif request.status == "rejected" %}
+          <p class="card-text">Date rejected: {{ request.date_rejected }}</p>
+          <p class="card-text">Rejected by: {{ request.rejected_by.first_name }} {{ request.rejected_by.last_name }}</p>
+        {% endif %}
       </div>
-    {% endfor %}
+    </div>
+  {% endfor %}
   </div>
 {% endblock %}

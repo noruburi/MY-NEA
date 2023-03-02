@@ -105,11 +105,18 @@ def update_teacher_request():
 
 
 
+# @auth.route('/teacher_requests_history')
+# @login_required
+# def view_teacher_requests():
+#     requests = TeacherRequestHistory.query.join(User, TeacherRequestHistory.user_id == User.id).order_by(User.role_requested_on.desc()).all()
+#     return render_template('teacher_requests_history.html', requests=requests, user=current_user)
+
 @auth.route('/teacher_requests_history')
 @login_required
 def view_teacher_requests():
-    requests = TeacherRequestHistory.query.join(User, TeacherRequestHistory.user_id == User.id).order_by(User.role_requested_on.desc()).all()
+    requests = TeacherRequestHistory.query.join(User, TeacherRequestHistory.user_id == User.id).order_by(User.role_requested_on).all()
     return render_template('teacher_requests_history.html', requests=requests, user=current_user)
+
 
 
 @auth.route('/logout')
