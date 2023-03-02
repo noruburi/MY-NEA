@@ -184,16 +184,16 @@ def sign_up():
                     flash('Email address already exists', category='error')
                     return redirect(url_for('auth.sign_up'))
                 
-                if request.form.get('role') == 'teacher':
+                if role_request:
                     # Create a new TeacherRequestHistory object with the user_id and status set to 'Pending'
-                    teacher_request = TeacherRequestHistory(user_id=current_user.id, status='Pending')
+                    teacher_request = TeacherRequestHistory(user_id=new_user.id, status='Pending')
                     db.session.add(teacher_request)
                     db.session.commit()
                     flash('Teacher role request sent', category='success')
-                    return redirect(url_for('views.home'))
                 else:
                     flash('Registration successful', category='success')
-                    return redirect(url_for('views.home'))
+
+                return redirect(url_for('views.home'))
                     
 
     roles = Role.query.all()
