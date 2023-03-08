@@ -19,6 +19,11 @@ def landing():
 def teacher():
     return render_template('teacher.html', user=current_user)
 
+@auth.route('/student')
+@login_required
+def student():
+    return render_template('student.html', user=current_user)
+
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -244,4 +249,4 @@ def transactions():
                 flash(f'Successfully awarded {points} points to {student.first_name}.', 'success')
                 return redirect(url_for('auth.transactions'))
 
-    return render_template('transactions.html', students=students)
+    return render_template('transactions.html', students=students, user=current_user)

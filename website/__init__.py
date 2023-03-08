@@ -35,6 +35,11 @@ def create_app():
             teacher_role = Role(name='teacher')
             db.session.add(teacher_role)
         
+        student_role = Role.query.filter_by(name='student').first()
+        if not student_role:
+            student_role = Role(name='student')
+            db.session.add(student_role)
+
         admin = User.query.filter_by(email='admin@Kimberley.com').first()
         if not admin:
             admin = User(email='admin@Kimberley.com', password=generate_password_hash('secret', method='sha256'), first_name='Admin', role_id=admin_role.id)
