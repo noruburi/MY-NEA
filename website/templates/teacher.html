@@ -3,7 +3,22 @@
 {% block title %}Teacher page{% endblock %}
 {% block content %}
 
-
+<h1>Transactions</h1>
+<form method="POST">
+  <div class="form-group">
+    <label for="student">Select a student:</label>
+    <select class="form-control" id="student" name="student_id">
+      {% for student in students %}
+        <option value="{{ student.id }}">{{ student.first_name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="form-group">
+    <label for="points">Enter the number of points:</label>
+    <input type="text" class="form-control" id="points" name="points">
+  </div>
+  <button type="submit" class="btn btn-primary">Submit</button>
+</form>
 
 {% endblock %}
 

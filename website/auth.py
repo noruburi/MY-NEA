@@ -14,6 +14,11 @@ auth = Blueprint('auth', __name__) #defines auth blueprint to create url
 def landing():
     return render_template("landing.html", user=current_user)
 
+@auth.route('/teacher')
+@login_required
+def teacher():
+    return render_template('teacher.html', user=current_user)
+
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -33,6 +38,8 @@ def login():
                         return redirect(url_for('auth.login'))
                     else:
                         flash('Logged in as teacher successfully!', category='success')
+                        login_user(user, remember=True)
+                        return redirect(url_for('auth.teacher'))
                 elif role.name == "student":
                     flash('Logged in as student successfully!', category='success')
                 login_user(user, remember=True)
@@ -196,4 +203,45 @@ def sign_up():
 
 
 
+@auth.route('/transactions', methods=['GET', 'POST'])
+@login_required
+def transactions():
+    if not current_user.is_teacher():
+        flash('You are not authorized to view this page.', 'error')
+        return redirect(url_for('views.home'))
 
+    students = User.query.filter_by(role_id=3).all() # Assuming student role ID is 3
+    if request.method == 'POST':
+        student_id = request.form.get('student_id')
+        points = request.form.get('points')
+        if not student_id or not points:
+            flash('Invalid input.', 'error')
+        else:
+            student = User.query.get(student_id)
+            if not student:
+                flash('Invalid student.', 'error')
+            else:
+                try:
+                    points = int(points)
+                except ValueError:
+                    flash('Points must be an integer.', 'error')
+                    return redirect(url_for('auth.transactions'))
+                if points < 1:
+                    flash('Points must be positive.', 'error')
+                    return redirect(url_for('auth.transactions'))
+                account = account.query.filter_by(id=student_id).first()
+                account.balance += points
+                db.session.add(account)
+                transaction = Transactions(
+                    sequence=Transactions.query.count() + 1,
+                    from_account_id=current_user.id,
+                    dateTime=datetime.now(),
+                    to_account_id=student_id,
+                    amount=points
+                )
+                db.session.add(transaction)
+                db.session.commit()
+                flash(f'Successfully awarded {points} points to {student.first_name}.', 'success')
+                return redirect(url_for('auth.transactions'))
+
+    return render_template('transactions.html', students=students)
