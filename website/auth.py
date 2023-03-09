@@ -222,7 +222,7 @@ def transactions():
         if not student_id or not points:
             flash('Invalid input.', 'error')
         else:
-            student = User.query.get(student_id)
+            students = User.query.filter_by(role='student').all()
             if not student:
                 flash('Invalid student.', 'error')
             else:
