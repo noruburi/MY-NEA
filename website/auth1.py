@@ -4,7 +4,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from .models import User, Role, Transactions, TeacherRequestHistory
 from . import db
 from sqlalchemy.exc import IntegrityError
-
+from datetime import datetime
 
 auth = Blueprint('auth', __name__) #defines auth blueprint to create url
 
@@ -13,6 +13,16 @@ auth = Blueprint('auth', __name__) #defines auth blueprint to create url
 @auth.route('/landing')
 def landing():
     return render_template("landing.html", user=current_user)
+
+@auth.route('/teacher')
+@login_required
+def teacher():
+    return render_template('teacher.html', user=current_user)
+
+@auth.route('/student')
+@login_required
+def student():
+    return render_template('student.html', user=current_user)
 
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
@@ -33,6 +43,8 @@ def login():
                         return redirect(url_for('auth.login'))
                     else:
                         flash('Logged in as teacher successfully!', category='success')
+                        login_user(user, remember=True)
+                        return redirect(url_for('auth.teacher'))
                 elif role.name == "student":
                     flash('Logged in as student successfully!', category='success')
                 login_user(user, remember=True)
@@ -61,64 +73,50 @@ def admin_page():
 @auth.route('/admin/update-teacher-request', methods=['POST'])
 @login_required
 def update_teacher_request():
-    # Get the user from the database
     user_id = request.form['user_id']
     user = User.query.get(user_id)
 
-    # Check if the user exists and has requested the teacher role
     if user is None or not user.role_request or user.role.name != 'teacher':
         flash('Invalid request.', 'error')
         return redirect(url_for('auth.admin_page'))
 
-    # Check if the current user is authorized to approve or reject teacher requests
     if not current_user.is_admin():
         flash('You are not authorized to approve or reject teacher requests.', 'error')
         return redirect(url_for('auth.admin_page'))
 
-    # Process the request
     action = request.form['action']
     if action == 'approve':
         user.role_approved = True
         user.role_request = False
         db.session.commit()
         flash(f'Teacher role request for {user.email} has been approved.', 'success')
-        
-        # Create a new TeacherRequestHistory record for the approval
-        teacher_request = TeacherRequestHistory(
-            user_id=user.id,
-            status='accepted',
-            date_requested=user.role_requested_on,
-            date_resolved=datetime.utcnow(),
-            resolved_by_id=current_user.id
-        )
-        db.session.add(teacher_request)
-        db.session.commit()
-
+        status = 'accepted'
     elif action == 'reject':
-        db.session.delete(user)
+        user.role_rejected = True
+        user.role_request = False
         db.session.commit()
         flash(f'Teacher role request for {user.email} has been rejected.', 'success')
-        
-        # Create a new TeacherRequestHistory record for the rejection
-        teacher_request = TeacherRequestHistory(
-            user_id=user.id,
-            status='rejected',
-            date_requested=user.role_requested_on,
-            date_resolved=datetime.utcnow(),
-            resolved_by_id=current_user.id
-        )
-        db.session.add(teacher_request)
-        db.session.commit()
+        status = 'rejected'
+
+    # Add a check to see if date_requested is None, and set it to the current time if it is
+    date_requested = user.role_requested_on
+
+    history_entry = TeacherRequestHistory(
+        user=user,
+        status=status,
+        date_resolved=datetime.utcnow(),
+        resolved_by=current_user
+    )
+    db.session.add(history_entry)
+    db.session.commit()
 
     return redirect(url_for('auth.admin_page'))
-
-
 
 
 @auth.route('/teacher_requests_history')
 @login_required
 def view_teacher_requests():
-    requests = TeacherRequestHistory.query.order_by(TeacherRequestHistory.date_requested.desc()).all()
+    requests = TeacherRequestHistory.query.join(User, TeacherRequestHistory.user_id == User.id).order_by(User.role_requested_on).all()
     return render_template('teacher_requests_history.html', requests=requests, user=current_user)
 
 
@@ -181,11 +179,11 @@ def sign_up():
                 if role is None:
                     flash('Invalid role selected', category='error')
                     return redirect(url_for('auth.sign_up'))
-
+                
                 role_request = request.form.get('role') == 'teacher'
                 print(role_request)
 
-                new_user = User(email=email,first_name=firstName,password=generate_password_hash(password1, method='sha256'),role=role,role_request=role_request)
+                new_user = User(email=email,first_name=firstName,password=generate_password_hash(password1, method='sha256'),role=role,role_request=role_request, role_requested_on=datetime.now())
                 try:
                     db.session.add(new_user)
                     db.session.commit()
@@ -193,12 +191,62 @@ def sign_up():
                     db.session.rollback()
                     flash('Email address already exists', category='error')
                     return redirect(url_for('auth.sign_up'))
+                
+                if role_request:
+                    # Create a new TeacherRequestHistory object with the user_id and status set to 'Pending'
+                    teacher_request = TeacherRequestHistory(user_id=new_user.id, status='Pending')
+                    db.session.add(teacher_request)
+                    db.session.commit()
+                    flash('Teacher role request sent', category='success')
+                else:
+                    flash('Registration successful', category='success')
 
-                flash('Account created!', category='success')
-                login_user(new_user)
                 return redirect(url_for('views.home'))
+                    
 
     roles = Role.query.all()
-    return render_template("sign_up.html", user=current_user, roles=roles)
+    return render_template('sign_up.html',user=current_user, roles=roles)
 
 
+@auth.route('/transactions', methods=['GET', 'POST'])
+@login_required
+def transactions():
+    if not current_user.is_teacher():
+        flash('You are not authorized to view this page.', 'error')
+        return redirect(url_for('views.home'))
+
+    students = User.query.filter_by(role_id=3).all() # Assuming student role ID is 3
+    if request.method == 'POST':
+        student_id = request.form.get('student_id')
+        points = request.form.get('points')
+        if not student_id or not points:
+            flash('Invalid input.', 'error')
+        else:
+            student = User.query.get(student_id)
+            if not student:
+                flash('Invalid student.', 'error')
+            else:
+                try:
+                    points = int(points)
+                except ValueError:
+                    flash('Points must be an integer.', 'error')
+                    return redirect(url_for('auth.transactions'))
+                if points < 1:
+                    flash('Points must be positive.', 'error')
+                    return redirect(url_for('auth.transactions'))
+                account = student.account
+                account.balance += points
+                db.session.add(account)
+                transaction = Transactions(
+                    sequence=Transactions.query.count() + 1,
+                    from_account_id=current_user.id,
+                    dateTime=datetime.now(),
+                    to_account_id=student_id,
+                    amount=points
+                )
+                db.session.add(transaction)
+                db.session.commit()
+                flash(f'Successfully awarded {points} points to {student.first_name}.', 'success')
+                return redirect(url_for('auth.transactions'))
+
+    return render_template('transactions.html', students=students, user=current_user)
