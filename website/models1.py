@@ -28,7 +28,7 @@ class Account(db.Model, UserMixin):
     balance = db.Column(db.Integer)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     user = db.relationship('User', backref=db.backref('accounts', lazy=True))
-    transactions = db.relationship('Transaction', backref='account', lazy=True)
+    transactions = db.relationship('Transactions', backref='account', lazy=True)
 
 class Transactions(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
