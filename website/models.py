@@ -10,7 +10,7 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(150), unique=True, index=True)
     password = db.Column(db.String(255))
-    first_name = db.Column(db.String(25))
+    user_name = db.Column(db.String(25))
     role_id = db.Column(db.Integer, db.ForeignKey('role.id'))
     role = db.relationship('Role', backref=db.backref('users', lazy=True))
     role_approved = db.Column(db.Boolean, default=False)
@@ -26,16 +26,13 @@ class User(db.Model, UserMixin):
 class Account(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     balance = db.Column(db.Integer)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    user = db.relationship('User', backref=db.backref('accounts', lazy=True))
-    transactions = db.relationship('Transaction', backref='account', lazy=True)
 
 class Transactions(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     sequence = db.Column(db.Integer)
-    from_account_id = db.Column(db.Integer, db.ForeignKey('account.id'))
+    from_account_id = db.Column(db.Integer)
     dateTime = db.Column(db.DateTime)
-    to_account_id = db.Column(db.Integer, db.ForeignKey('account.id'))
+    to_account_id = db.Column(db.Integer)
     amount = db.Column(db.Integer)
     
 class TeacherRequestHistory(db.Model):
