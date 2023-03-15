@@ -92,7 +92,7 @@ def update_teacher_request():
         flash(f'Teacher role request for {user.email} has been approved.', 'success')
         status = 'accepted'
     elif action == 'reject':
-        user.role_rejected = True
+        db.session.delete(user)
         db.session.commit()
         flash(f'Teacher role request for {user.email} has been rejected.', 'success')
         status = 'rejected'
@@ -207,51 +207,3 @@ def sign_up():
     return render_template('sign_up.html',user=current_user, roles=roles)
 
 
-@auth.route('/transactions', methods=['GET', 'POST'])
-@login_required
-def transactions():
-    if not current_user.is_teacher():
-        flash('You are not authorized to view this page.', 'error')
-        return redirect(url_for('views.home'))
-
-    students = User.query.filter_by(role_id=3).all() # Assuming student role ID is 3
-    if request.method == 'POST':
-        student_id = request.form.get('student_id')
-        points = request.form.get('points')
-        if not student_id or not points:
-            flash('Invalid input.', 'error')
-        else:
-            student = User.query.filter_by(id=student_id, role_id=3).first() # Assuming student role ID is 3
-            if not student:
-                flash('Invalid student.', 'error')
-            else:
-                try:
-                    points = int(points)
-                except ValueError:
-                    flash('Points must be an integer.', 'error')
-                    return redirect(url_for('auth.transactions'))
-                if points < 1:
-                    flash('Points must be positive.', 'error')
-                    return redirect(url_for('auth.transactions'))
-                student_account = Account.query.filter_by(user_id=student.id).first()
-                teacher_account = Account.query.filter_by(user_id=current_user.id).first()
-                if teacher_account.balance < points:
-                    flash('Not enough balance.', 'error')
-                    return redirect(url_for('auth.transactions'))
-                student_account.balance += points
-                teacher_account.balance -= points
-                db.session.add(student_account)
-                db.session.add(teacher_account)
-                transaction = Transactions(
-                    sequence=Transactions.query.count() + 1,
-                    from_account_id=teacher_account.id,
-                    dateTime=datetime.now(),
-                    to_account_id=student_account.id,
-                    amount=points
-                )
-                db.session.add(transaction)
-                db.session.commit()
-                flash(f'Successfully awarded {points} points to {student.first_name}.', 'success')
-                return redirect(url_for('auth.transactions'))
-
-    return render_template('transactions.html', students=students, user=current_user)

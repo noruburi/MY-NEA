@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for
 from flask_login import login_user, current_user, logout_user, login_required
 from werkzeug.security import check_password_hash, generate_password_hash
-from .models import User, Role, Transactions, TeacherRequestHistory
+from .models import User, Role, Transactions, TeacherRequestHistory, Account
 from . import db
 from sqlalchemy.exc import IntegrityError
 from datetime import datetime
@@ -93,6 +93,7 @@ def update_teacher_request():
         status = 'accepted'
     elif action == 'reject':
         user.role_rejected = True
+        user.role_request = False
         db.session.commit()
         flash(f'Teacher role request for {user.email} has been rejected.', 'success')
         status = 'rejected'
@@ -211,42 +212,30 @@ def sign_up():
 @auth.route('/transactions', methods=['GET', 'POST'])
 @login_required
 def transactions():
-    if not current_user.is_teacher():
-        flash('You are not authorized to view this page.', 'error')
-        return redirect(url_for('views.home'))
-
-    students = User.query.filter_by(role_id=3).all() # Assuming student role ID is 3
-    if request.method == 'POST':
-        student_id = request.form.get('student_id')
-        points = request.form.get('points')
-        if not student_id or not points:
-            flash('Invalid input.', 'error')
-        else:
-            students = User.query.filter_by(role='student').all()
-            if not student:
-                flash('Invalid student.', 'error')
-            else:
-                try:
-                    points = int(points)
-                except ValueError:
-                    flash('Points must be an integer.', 'error')
-                    return redirect(url_for('auth.transactions'))
-                if points < 1:
-                    flash('Points must be positive.', 'error')
-                    return redirect(url_for('auth.transactions'))
-                account = account.query.filter_by(id=student_id).first()
-                account.balance += points
-                db.session.add(account)
+    if current_user.is_admin() or current_user.is_teacher():
+        students = User.query.filter_by(role_id=3).all()
+        if request.method == 'POST':
+            student_id = request.form['student_id']
+            points = request.form['points']
+            student_account = Account.query.filter_by(id=student_id).first()
+            if student_account:
+                student_account.balance += int(points)
+                db.session.commit()
                 transaction = Transactions(
-                    sequence=Transactions.query.count() + 1,
+                    sequence=1,
                     from_account_id=current_user.id,
-                    dateTime=datetime.now(),
+                    dateTime=datetime.utcnow(),
                     to_account_id=student_id,
-                    amount=points
+                    amount=int(points)
                 )
                 db.session.add(transaction)
                 db.session.commit()
-                flash(f'Successfully awarded {points} points to {student.first_name}.', 'success')
+                flash('Transaction successful!', 'success')
                 return redirect(url_for('auth.transactions'))
+            else:
+                flash('Invalid student ID', 'danger')
+    else:
+        abort(403)
 
+    students = User.query.filter_by(role_id=3).all() # Assuming student role ID is 3
     return render_template('transactions.html', students=students, user=current_user)
