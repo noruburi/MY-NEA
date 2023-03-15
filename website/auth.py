@@ -150,20 +150,39 @@ def password_strength(password):
         if not any(char in set(r"!@#$%^&*()/") for char in password):
             missing_requirements.append("Password must contain at least one symbol (!@#$%^&*()/).")
         return score, ", ".join(missing_requirements)
+    
+
+    
+def generate_username(first_name, last_name):
+    base_username = first_name[:3].lower() + last_name[:3].lower()
+    username = base_username
+    counter = 1
+
+    while User.query.filter_by(user_name=username).first() is not None:
+        username = base_username + str(counter)
+        counter += 1
+
+    return username
+
+def contains_digit(s):
+    return any(c.isdigit() for c in s)
+
 
 @auth.route('/sign_up', methods=['GET', 'POST'])
 def sign_up():
     if request.method == 'POST':
         email = request.form.get('email')
-        userName = request.form.get('firstName')
+        first_name = request.form.get('first_name')
+        last_name = request.form.get('last_name')
         password1 = request.form.get('password1')
         password2 = request.form.get('password2')
-        role = request.form.get('role') #student or teacher
+        role = request.form.get('role')
+
 
         if len(email) < 4:
             flash('Email must be greater than 3 characters.', category='error')
-        elif len(userName) < 2:
-            flash('User name must be greater than 1 character.', category='error')
+        elif contains_digit(first_name) or contains_digit(last_name) or len(first_name) < 2 or len(last_name) < 2:
+            flash('First name and last name must not contain numbers and should be at least 2 characters long.', category='error')
         elif password1 != password2:
             flash('Passwords don\'t match.', category='error')
         elif len(password1) < 7:

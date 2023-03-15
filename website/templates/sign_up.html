@@ -3,6 +3,28 @@
 {% block content %}
     <form method="POST" class="sign-up-form">
       <h3 align="center">Sign Up</h3>
+      <!-- Add first_name and last_name input fields -->
+      <div class="form-group">
+        <label for="first_name">First Name</label>
+        <input
+          type="text"
+          class="form-control"
+          id="first_name"
+          name="first_name"
+          placeholder="Enter first name"
+        />
+      </div>
+      <div class="form-group">
+        <label for="last_name">Last Name</label>
+        <input
+          type="text"
+          class="form-control"
+          id="last_name"
+          name="last_name"
+          placeholder="Enter last name"
+        />
+      </div>
+      <!-- End of first_name and last_name input fields -->
       <div class="form-group">
         <label for="email">Email Address</label>
         <input
@@ -13,16 +35,7 @@
           placeholder="Enter email"
         />
       </div>
-      <div class="form-group">
-        <label for="userName">User name</label>
-        <input
-          type="text"
-          class="form-control"
-          id="userName"
-          name="userName"
-          placeholder="Enter user name"
-        />
-      </div>
+      <!-- Remove the user_name input field -->
       <div class="form-group">
         <label for="password1">Password</label>
         <input
