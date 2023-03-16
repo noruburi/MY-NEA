@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for
 from flask_login import login_user, current_user, logout_user, login_required
 from werkzeug.security import check_password_hash, generate_password_hash
-from .models import User, Role, Transactions, TeacherRequestHistory, Account, Class, Subject
+from .models import User, Role, Transactions, TeacherRequestHistory, Account, Class, Subject, JoinRequest
 from . import db
 from sqlalchemy.exc import IntegrityError
 from datetime import datetime
@@ -18,7 +18,15 @@ def landing():
 @auth.route('/teacher')
 @login_required
 def teacher():
-    return render_template('teacher.html', user=current_user)
+    # Fetch classes created by the current user (teacher)
+    classes = Class.query.filter_by(teacher_id=current_user.id).all()
+
+    # Fetch student join requests for each class
+    join_requests = {}
+    for class_obj in classes:
+        join_requests[class_obj.id] = JoinRequest.query.filter_by(class_id=class_obj.id).all()
+
+    return render_template('teacher.html', user=current_user, classes=classes, join_requests=join_requests)
 
 
 @auth.route('/login', methods=['GET', 'POST'])
@@ -253,8 +261,7 @@ def transactions():
                 return redirect(url_for('auth.transactions'))
             else:
                 flash('Invalid student ID', 'danger')
-    else:
-        abort(403)
+
 
     students = User.query.filter_by(role_id=3).all() # Assuming student role ID is 3
     return render_template('transactions.html', students=students, user=current_user)
@@ -330,13 +337,13 @@ def student(student_id):
 
 
 
-
-
 @auth.route('/request_join_class/<int:student_id>/<int:class_id>', methods=['GET'])
 def request_join_class(student_id, class_id):
-    # Logic for handling join request goes here.
-    # For example, create a new entry in the database with the student's request.
-    
+    # Create a new join request object
+    join_request = JoinRequest(student_id=student_id, class_id=class_id, status='pending')
+    db.session.add(join_request)
+    db.session.commit()
+
     flash('Join request sent successfully', category='success')
     return redirect(url_for('auth.student', student_id=student_id))
     

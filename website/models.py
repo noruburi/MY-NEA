@@ -74,3 +74,14 @@ class Class(db.Model):
         teacher_first_name_initial = self.teacher.first_name[0].upper() if self.teacher.first_name else ''
         teacher_last_name_initial = self.teacher.last_name[0].upper() if self.teacher.last_name else ''
         return f"{self.year_group}{subject_initial}{teacher_first_name_initial}{teacher_last_name_initial}"
+    
+class JoinRequest(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    student_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    student = db.relationship('User', backref=db.backref('join_requests', lazy=True))
+    class_id = db.Column(db.Integer, db.ForeignKey('class.id'))
+    class_ = db.relationship('Class', backref=db.backref('join_requests', lazy=True))
+    status = db.Column(db.String(20))
+
+# To link the model to users with a student ID of 3:
+join_requests = JoinRequest.query.join(User).filter(User.id == 3).all()
