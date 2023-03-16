@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for
 from flask_login import login_user, current_user, logout_user, login_required
 from werkzeug.security import check_password_hash, generate_password_hash
-from .models import User, Role, Transactions, TeacherRequestHistory, Account
+from .models import User, Role, Transactions, TeacherRequestHistory, Account, Class, Subject
 from . import db
 from sqlalchemy.exc import IntegrityError
 from datetime import datetime
@@ -261,3 +261,35 @@ def transactions():
 
     students = User.query.filter_by(role_id=3).all() # Assuming student role ID is 3
     return render_template('transactions.html', students=students, user=current_user)
+
+@auth.route('/create_class', methods=['GET', 'POST'])
+@login_required
+def create_class():
+    if current_user.role.name != 'teacher':
+        flash('You must be a teacher to create a class', category='error')
+        return redirect(url_for('views.home'))
+
+    if request.method == 'POST':
+        subject_id = request.form.get('subject')
+        year_group = request.form.get('year_group')
+
+        if subject_id and year_group:
+            subject = Subject.query.get(subject_id)
+            base_class_name = f"{year_group}{subject.name[0]}{current_user.first_name[0]}{current_user.last_name[0]}"
+            class_name = base_class_name
+            counter = 1
+
+            while Class.query.filter_by(name=class_name).first() is not None:
+                class_name = base_class_name + str(counter)
+                counter += 1
+
+            new_class = Class(name=class_name, subject_id=subject_id, year_group=year_group, teacher_id=current_user.id)
+            db.session.add(new_class)
+            db.session.commit()
+
+            flash('Class created successfully', category='success')
+        else:
+            flash('Please fill out all fields', category='error')
+
+    subjects = Subject.query.all()
+    return render_template("create_class.html", user=current_user, subjects=subjects)

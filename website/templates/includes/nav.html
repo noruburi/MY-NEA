@@ -3,13 +3,14 @@
   <a class="nav-item nav-link" id="login" href="/admin">Admin Panel</a>
   <a class="nav-item nav-link" id="login" href="/teacher_requests_history">request history</a>
   <a class="nav-item nav-link" id="logout" href="/logout">Logout</a>
-{% elif user.is_authenticated %}
-  <a class="nav-item nav-link" id="login" href="/">Profile</a>
+{% elif user.is_authenticated and user.role.name == 'teacher' %}
+  <a class="nav-item nav-link" id="login" href="/teacher">Home</a>
+  <a class="nav-item nav-link" id="login" href="/create_class">class creation</a>
   <a class="nav-item nav-link" id="logout" href="/logout">Logout</a>
 {% else %}
   <a class="nav-item nav-link" id="login" href="/landing">Home</a>
   <a class="nav-item nav-link" id="login" href="/login">Login</a>
   <a class="nav-item nav-link" id="login" href="/sign_up">sign up</a>
-{% endif %}
   <a href="#contact">Contact Us</a>
+{% endif %}
 </div>
