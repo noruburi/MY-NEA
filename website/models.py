@@ -83,5 +83,3 @@ class JoinRequest(db.Model):
     class_ = db.relationship('Class', backref=db.backref('join_requests', lazy=True))
     status = db.Column(db.String(20))
 
-# To link the model to users with a student ID of 3:
-join_requests = JoinRequest.query.join(User).filter(User.id == 3).all()

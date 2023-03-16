@@ -15,18 +15,26 @@ auth = Blueprint('auth', __name__) #defines auth blueprint to create url
 def landing():
     return render_template("landing.html", user=current_user)
 
+# @auth.route('/teacher')
+# @login_required
+# def teacher():
+#     # Fetch classes created by the current user (teacher)
+#     classes = Class.query.filter_by(teacher_id=current_user.id).all()
+
+#     # Fetch student join requests for each class
+#     join_requests = {}
+#     for class_obj in classes:
+#         join_requests[class_obj.id] = JoinRequest.query.filter_by(class_id=class_obj.id).all()
+
+#     return render_template('teacher.html', user=current_user, classes=classes, join_requests=join_requests)
+
+
 @auth.route('/teacher')
 @login_required
 def teacher():
-    # Fetch classes created by the current user (teacher)
-    classes = Class.query.filter_by(teacher_id=current_user.id).all()
+    join_requests = JoinRequest.query.join(User).filter(User.id == 3).all()
+    return render_template('teacher.html', user=current_user, join_requests=join_requests)
 
-    # Fetch student join requests for each class
-    join_requests = {}
-    for class_obj in classes:
-        join_requests[class_obj.id] = JoinRequest.query.filter_by(class_id=class_obj.id).all()
-
-    return render_template('teacher.html', user=current_user, classes=classes, join_requests=join_requests)
 
 
 @auth.route('/login', methods=['GET', 'POST'])

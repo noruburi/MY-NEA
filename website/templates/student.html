@@ -5,24 +5,26 @@
 
 <!-- Add the following section to display the classes -->
 <div class="container">
-  <h2>Available Classes</h2>
+  <h2>Join Requests</h2>
   <table class="table table-striped">
     <thead>
       <tr>
-        <th>Class Name</th> <!-- Add this new header -->
-        <th>Subject</th>
-        <th>Year Group</th>
-        <th>Teacher</th>
-
+        <th>Class Name</th>
+        <th>Status</th>
+        <th>Actions</th>
       </tr>
     </thead>
     <tbody>
-      {% for class in classes %}
+      {% for join_request in student.join_requests %}
       <tr>
-        <td>{{ class.class_name() }}</td> <!-- Display the generated class name -->
-        <td>{{ class.subject.name }}</td>
-        <td>{{ class.year_group }}</td>
-        <td><a href="{{ url_for('auth.request_join_class', student_id=student.id, class_id=class.id) }}" class="btn btn-primary">Request to Join</a></td>
+        <td>{{ join_request.class_.name }}</td>
+        <td>{{ join_request.status }}</td>
+        <td>
+          {% if join_request.status == 'pending' %}
+          <a href="{{ url_for('auth.accept_join_request', join_request_id=join_request.id) }}" class="btn btn-success">Accept</a>
+          <a href="{{ url_for('auth.reject_join_request', join_request_id=join_request.id) }}" class="btn btn-danger">Reject</a>
+          {% endif %}
+        </td>
       </tr>
       {% endfor %}
     </tbody>
