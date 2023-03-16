@@ -5,6 +5,7 @@ from .models import User, Role, Transactions, TeacherRequestHistory, Account, Cl
 from . import db
 from sqlalchemy.exc import IntegrityError
 from datetime import datetime
+from sqlalchemy import and_
 
 auth = Blueprint('auth', __name__) #defines auth blueprint to create url
 
@@ -291,11 +292,45 @@ def create_class():
     return render_template("create_class.html", user=current_user, subjects=subjects)
 
 
+# @auth.route('/student/<int:student_id>', methods=['GET'])
+# def student(student_id):
+#     student = User.query.filter_by(id=student_id, role_id=3).all()
+#     classes = Class.query.all()
+#     return render_template('student.html', student=student, classes=classes)
+
+
+
 @auth.route('/student/<int:student_id>', methods=['GET'])
 def student(student_id):
     student = User.query.filter_by(id=student_id, role_id=3).first_or_404()
-    classes = Class.query.all()
-    return render_template('student.html', student=student, classes=classes)
+    print("student: ", student)
+    
+    search_year_group = request.args.get('year_group', type=int)
+    search_subject_id = request.args.get('subject_id', type=int)
+    search_teacher_id = request.args.get('teacher_id', type=int)  # New filter
+    
+    search_filters = []
+    if search_year_group:
+        search_filters.append(Class.year_group == search_year_group)
+    if search_subject_id:
+        search_filters.append(Class.subject_id == search_subject_id)
+    if search_teacher_id:  # Add the filter for teacher_id
+        search_filters.append(Class.teacher_id == search_teacher_id)
+    
+    if search_filters:
+        classes = Class.query.filter(and_(*search_filters)).all()
+    else:
+        classes = Class.query.all()
+        
+    subjects = Subject.query.all()
+    teachers = User.query.filter_by(role_id=2).all()  # Fetch all teachers
+
+    print("classes: ", classes)
+    return render_template('student.html', student=student, classes=classes, user=current_user, search_year_group=search_year_group, search_subject_id=search_subject_id, search_teacher_id=search_teacher_id, subjects=subjects, teachers=teachers)
+
+
+
+
 
 @auth.route('/request_join_class/<int:student_id>/<int:class_id>', methods=['GET'])
 def request_join_class(student_id, class_id):
