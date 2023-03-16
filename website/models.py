@@ -10,6 +10,8 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(150), unique=True, index=True)
     password = db.Column(db.String(255))
+    first_name = db.Column(db.String(25))
+    last_name = db.Column(db.String(25))
     user_name = db.Column(db.String(25))
     role_id = db.Column(db.Integer, db.ForeignKey('role.id'))
     role = db.relationship('Role', backref=db.backref('users', lazy=True))
@@ -46,3 +48,23 @@ class TeacherRequestHistory(db.Model):
 
     def __repr__(self):
         return f"<TeacherRequestHistory {self.id}>"
+
+class Subject(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), unique=True)
+
+student_class = db.Table('student_class',
+    db.Column('student_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
+    db.Column('class_id', db.Integer, db.ForeignKey('class.id'), primary_key=True)
+)
+
+class Class(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), unique=True)
+    subject_id = db.Column(db.Integer, db.ForeignKey('subject.id'))
+    subject = db.relationship('Subject', backref=db.backref('classes', lazy=True))
+    year_group = db.Column(db.Integer)
+    teacher_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    teacher = db.relationship('User', backref=db.backref('classes', lazy=True))
+    students = db.relationship('User', secondary=student_class, lazy='subquery',
+        backref=db.backref('enrolled_classes', lazy=True))

@@ -199,10 +199,12 @@ def sign_up():
                     flash('Invalid role selected', category='error')
                     return redirect(url_for('auth.sign_up'))
                 
+                user_name = generate_username(first_name, last_name)
+
                 role_request = request.form.get('role') == 'teacher'
                 print(role_request)
 
-                new_user = User(email=email,user_name=userName,password=generate_password_hash(password1, method='sha256'),role=role,role_request=role_request, role_requested_on=datetime.now())
+                new_user = User(email=email, first_name=first_name, last_name=last_name, user_name=user_name, password=generate_password_hash(password1, method='sha256'), role=role, role_request=role_request, role_requested_on=datetime.now())
                 try:
                     db.session.add(new_user)
                     db.session.commit()
@@ -216,11 +218,12 @@ def sign_up():
                     teacher_request = TeacherRequestHistory(user_id=new_user.id, status='Pending')
                     db.session.add(teacher_request)
                     db.session.commit()
-                    flash('Teacher role request sent', category='success')
+                    flash('Teacher role request sent. Please wait for approval.', category='success')
+                    return redirect(url_for('auth.sign_up'))  # Redirect to sign-up page
                 else:
                     flash('Registration successful', category='success')
-
-                return redirect(url_for('views.home'))
+                    login_user(new_user)
+                    return redirect(url_for('views.home'))
                     
 
     roles = Role.query.all()

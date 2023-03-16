@@ -3,11 +3,11 @@
 {% block title %}Teacher page{% endblock %}
 {% block content %}
 
-<h1>Transactions</h1>
+
 <div class="container">
   <h1>Transactions</h1>
   <p>Enter the student's email and the amount you'd like to increase their balance by.</p>
-  <form method="POST" action="{{ url_for('transactions') }}">
+  <form method="POST" action="{{ url_for('auth.transactions') }}">
       <div class="form-group">
           <label for="student_email">Student Email:</label>
           <input type="email" class="form-control" id="student_email" name="student_email" required>
