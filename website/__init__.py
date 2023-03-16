@@ -46,8 +46,16 @@ def create_app():
             db.session.add(admin)
             db.session.commit()
         db.session.commit()
+    
+        subjects_list = ['Math', 'English', 'Science', 'History', 'Geography', 'Art', 'Physical Education', 'Music']
+        for subject_name in subjects_list:
+            subject = Subject.query.filter_by(name=subject_name).first()
+            if not subject:
+                new_subject = Subject(name=subject_name)
+                db.session.add(new_subject)
+                db.session.commit()
 
-    from .models import User, Role    
+    from .models import User, Role, Subject    
 
     from .auth import auth as auth_blueprint
     app.register_blueprint(auth_blueprint)

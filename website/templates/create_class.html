@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Create Class{% endblock %}
+{% block content %}
+<div class="container">
+  <h1>Create Class</h1>
+  <form method="POST" action="{{ url_for('views.create_class') }}">
+    {{ form.csrf_token }}
+    <div class="form-group">
+      <label for="subject">Subject</label>
+      <select class="form-control" id="subject" name="subject">
+        {% for subject in subjects %}
+        <option value="{{ subject.id }}">{{ subject.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="year_group">Year Group</label>
+      <input type="number" class="form-control" id="year_group" name="year_group" min="1" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+</div>
+{% endblock %}
