@@ -1,8 +1,30 @@
 {% extends "base.html" %}
 
-{% block title %}Teacher page{% endblock %}
 {% block content %}
+<!-- Existing content for the student -->
 
-
-
+<!-- Add the following section to display the classes -->
+<div class="container">
+  <h2>Available Classes</h2>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Subject</th>
+        <th>Year Group</th>
+        <th>Teacher</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for class in classes %}
+      <tr>
+        <td>{{ class.subject.name }}</td>
+        <td>{{ class.year_group }}</td>
+        <td>{{ class.teacher.name }}</td>
+        <td><a href="{{ url_for('auth.request_join_class', student_id=student.id, class_id=class.id) }}" class="btn btn-primary">Request to Join</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
 {% endblock %}

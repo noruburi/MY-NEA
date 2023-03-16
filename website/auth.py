@@ -19,10 +19,6 @@ def landing():
 def teacher():
     return render_template('teacher.html', user=current_user)
 
-@auth.route('/student')
-@login_required
-def student():
-    return render_template('student.html', user=current_user)
 
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
@@ -293,3 +289,21 @@ def create_class():
 
     subjects = Subject.query.all()
     return render_template("create_class.html", user=current_user, subjects=subjects)
+
+
+@auth.route('/student/<int:student_id>', methods=['GET'])
+def student(student_id):
+    student = User.query.filter_by(id=student_id, role_id=3).first_or_404()
+    classes = Class.query.all()
+    return render_template('student.html', student=student, classes=classes)
+
+@auth.route('/request_join_class/<int:student_id>/<int:class_id>', methods=['GET'])
+def request_join_class(student_id, class_id):
+    # Logic for handling join request goes here.
+    # For example, create a new entry in the database with the student's request.
+    
+    flash('Join request sent successfully', category='success')
+    return redirect(url_for('auth.student', student_id=student_id))
+    
+
+
