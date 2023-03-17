@@ -17,7 +17,8 @@ class User(db.Model, UserMixin):
     role = db.relationship('Role', backref=db.backref('users', lazy=True))
     role_approved = db.Column(db.Boolean, default=False)
     role_request = db.Column(db.Boolean, default=False)
-    role_requested_on = db.Column(db.DateTime) # add this line
+    role_requested_on = db.Column(db.DateTime)
+    points_per_week = db.Column(db.Integer, default=0)
 
     def is_admin(self):
         return self.role.name == 'admin'
@@ -75,13 +76,7 @@ class Class(db.Model):
         teacher_last_name_initial = self.teacher.last_name[0].upper() if self.teacher.last_name else ''
         return f"{self.year_group}{subject_initial}{teacher_first_name_initial}{teacher_last_name_initial}"
     
-# class JoinRequest(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     student_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-#     student = db.relationship('User', backref=db.backref('join_requests', lazy=True))
-#     class_id = db.Column(db.Integer, db.ForeignKey('class.id'))
-#     class_ = db.relationship('Class', backref=db.backref('join_requests', lazy=True))
-#     status = db.Column(db.String(20))
+
 
 class JoinRequest(db.Model):
     id = db.Column(db.Integer, primary_key=True)

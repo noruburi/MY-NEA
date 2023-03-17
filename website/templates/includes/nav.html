@@ -5,6 +5,7 @@
   <a class="nav-item nav-link" id="logout" href="/logout">Logout</a>
 {% elif user.is_authenticated and user.role.name == 'teacher' %}
   <a class="nav-item nav-link" id="login" href="/teacher">Home</a>
+  <a class="nav-item nav-link" id="login" href="/award_points">award points</a>
   <a class="nav-item nav-link" id="login" href="/create_class">class creation</a>
   <a class="nav-item nav-link" id="logout" href="/logout">Logout</a>
   {% elif user.is_authenticated and user.role.name == 'student' %}

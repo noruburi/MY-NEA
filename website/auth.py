@@ -11,9 +11,9 @@ auth = Blueprint('auth', __name__) #defines auth blueprint to create url
 
 
 
-@auth.route('/landing')
-def landing():
-    return render_template("landing.html", user=current_user)
+# @auth.route('/landing')
+# def landing():
+#     return render_template("landing.html", user=current_user)
 
 
 @auth.route('/teacher')
@@ -256,11 +256,9 @@ def sign_up():
     roles = Role.query.all()
     return render_template('sign_up.html',user=current_user, roles=roles)
 
-
-
-@auth.route('/transactions', methods=['GET', 'POST'])
+@auth.route('/award_points', methods=['GET', 'POST'])
 @login_required
-def transactions():
+def award_points():
     if current_user.is_admin() or current_user.is_teacher():
         students = User.query.filter_by(role_id=3).all()
         if request.method == 'POST':
@@ -284,9 +282,11 @@ def transactions():
             else:
                 flash('Invalid student ID', 'danger')
 
+        
+    students = User.query.filter_by(role_id=3).all()
+    return render_template('award_points.html', students=students, user=current_user)
 
-    students = User.query.filter_by(role_id=3).all() # Assuming student role ID is 3
-    return render_template('transactions.html', students=students, user=current_user)
+
 
 @auth.route('/create_class', methods=['GET', 'POST'])
 @login_required
