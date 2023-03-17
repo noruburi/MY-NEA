@@ -1,36 +1,44 @@
 {% extends "base.html" %}
 
 {% block title %}Teacher page{% endblock %}
+
 {% block content %}
 <div class="container">
-<div class="row">
-  <div class="col-md-6">
-    <div id="myChartContainer">
-      <canvas id="myChart"></canvas>
+  <div class="row">
+    <div class="col-md-6">
+      <div id="pieChartContainer">
+        <canvas id="pieChart"></canvas>
+      </div>
+      <p class="text-center mt-2">Points Remaining: {{ current_user.remaining_points }}</p>
     </div>
-    <p class="text-center mt-2">Points Remaining: {{ current_user.remaining_points }}</p>
+    <div class="col-md-6">
+      <div id="barChartContainer">
+        <canvas id="barChart"></canvas>
+      </div>
+    </div>
   </div>
-</div>
-<table>
-  <thead>
-    <tr>
-      <th>Class Name</th>
-      <th>Year Group</th>
-      <th>Subject</th>
-      <th>Points Awarded</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for class in classes %}
+  <table>
+    <thead>
       <tr>
-        <td>{{ class.name }}</td>
-        <td>{{ class.year_group }}</td>
-        <td>{{ class.subject }}</td>
-        <td>{{ class.points_awarded }}</td>
+        <th>Class Name</th>
+        <th>Year Group</th>
+        <th>Subject</th>
+        <th>Points Awarded</th>
       </tr>
-    {% endfor %}
-  </tbody>
-</table>
-<script src="{{ url_for('static', filename='js/teacher.js') }}"></script>
+    </thead>
+    <tbody>
+      {% for class in classes %}
+        <tr>
+          <td>{{ class.name }}</td>
+          <td>{{ class.year_group }}</td>
+          <td>{{ class.subject }}</td>
+          <td>{{ class.points_awarded }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
 </div>
+
+<script src="{{ url_for('static', filename='js/Chart.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/teacher.js') }}"></script>
 {% endblock %}
