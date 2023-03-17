@@ -38,54 +38,32 @@ p {
 }
 
 .navbar {
-    overflow: hidden;
-    background-color: #ffff66 !important;
-    margin: 0 !important;
-    padding: 0 5% !important;
-    border-radius: 0 !important;
-    display: block !important;
+  background-color: #333;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1;
 }
+
 .navbar a {
   float: left;
-  font-size: 16px;
-  color: white;
+  display: block;
+  color: #f2f2f2;
   text-align: center;
   padding: 14px 16px;
   text-decoration: none;
-}
-
-.navbar-fixed-top {
-   min-height:5px;
-    height:10px;
-    padding-top:0;
-}
-.navbar-inner {
-    background: #ffff66;
-    border-radius:0;
-    filter: none;
-    border: none;
-    box-shadow: none;
-}
-
-
-/*
-2. Sections
-***************************************************************************/
-/* Submenu css*/
-.navbar a {
-  float: left;
-  font-size: 16px;
-  color:#000;
-  text-align: center;
-  padding: 14px 16px;
-  text-decoration: none;
-  font-weight:bold;
 }
 
 .navbar a:hover {
-  background-color:#000 ;
-  color:white;
+  background-color: #ddd;
+  color: black;
 }
+
+.active {
+  background-color: #4CAF50;
+  color: white;
+}
+
 
 /* tables css*/
 /* Style the "Transactions" heading */
@@ -121,28 +99,13 @@ tr:hover {background-color: #f5f5f5;}
   padding: 20px;
 }
 
-
+th {
+  color: #000000;
+}
 /*
 3. Footer
 ********************************************************************/
-/* .footer {
-    box-shadow: 0px -5px 10px 0px #ffd700;
-    background-color: black;
-    line-height: 1;
-    text-align: left;
-    font-family: "Arial Narrow", Arial, sans-serif;
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-  }
-.footer p {
-    color:lightgrey;
-    margin:0;
-}
 
-.footer a{
-    color:#FECE1A;
-} */
 
 .footer-fixed {
     box-shadow: 0px -5px 10px 0px #ffd700;

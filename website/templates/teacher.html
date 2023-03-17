@@ -20,31 +20,31 @@
   </form>
 </div>
 <div class="container">
-    <h2>Join Requests</h2>
-    <table class="table table-striped">
-      <thead>
-        <tr>
-          <th>Student</th>
-          <th>Class</th>
-          <th>Status</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for join_request in join_requests %}
-        <tr>
-          <td>{{ join_request.student.username }}</td>
-          <td>{{ join_request.class_.name }}</td>
-          <td>{{ join_request.status }}</td>
-          <td>
-            <a href="{{ url_for('auth.respond_join_request', join_request_id=join_request.id, action='accept') }}" class="btn btn-primary">Accept</a>
-            <a href="{{ url_for('auth.respond_join_request', join_request_id=join_request.id, action='reject') }}" class="btn btn-danger">Reject</a>
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
+  <h2>Join Requests</h2>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Student</th>
+        <th>Class</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for join_request in join_requests %}
+      <tr>
+        <td>{{ join_request.student.user_name }}</td>
+        <td>{{ join_request.class_.name }}</td>
+        <td>{{ join_request.status }}</td>
+        <td>
+          <a href="{{ url_for('auth.respond_join_request', join_request_id=join_request.id, action='accept') }}" class="btn btn-primary">Accept</a>
+          <a href="{{ url_for('auth.respond_join_request', join_request_id=join_request.id, action='reject') }}" class="btn btn-danger">Reject</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
 
 {% endblock %}
 

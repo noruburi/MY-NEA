@@ -119,6 +119,33 @@ def view_teacher_requests():
     requests = TeacherRequestHistory.query.join(User, TeacherRequestHistory.user_id == User.id).order_by(User.role_requested_on).all()
     return render_template('teacher_requests_history.html', requests=requests, user=current_user)
 
+@auth.route('/respond_join_request/<int:join_request_id>/<string:action>', methods=['GET'])
+@login_required
+def respond_join_request(join_request_id, action):
+    # Get the join request object
+    join_request = JoinRequest.query.get_or_404(join_request_id)
+
+    # Check if the current user is the teacher of the class
+    if current_user.id != join_request.class_.teacher_id:
+        flash('You are not authorized to respond to this join request!', category='error')
+        return redirect(url_for('auth.teacher'))
+
+    # Update the status of the join request
+    if action == 'accept':
+        join_request.status = 'accepted'
+        flash('Join request accepted!', category='success')
+    elif action == 'reject':
+        join_request.status = 'rejected'
+        flash('Join request rejected!', category='success')
+    else:
+        flash('Invalid action!', category='error')
+        return redirect(url_for('auth.teacher'))
+
+    # Commit the changes to the database
+    db.session.commit()
+
+    # Redirect to the teacher dashboard
+    return redirect(url_for('auth.teacher'))
 
 @auth.route('/logout')
 @login_required
@@ -268,9 +295,15 @@ def create_class():
         flash('You must be a teacher to create a class', category='error')
         return redirect(url_for('views.home'))
 
+    subjects = Subject.query.all()
+
     if request.method == 'POST':
         subject_id = request.form.get('subject')
         year_group = request.form.get('year_group')
+
+        existing_class = Class.query.filter_by(subject_id=subject_id, year_group=year_group, teacher_id=current_user.id).first()
+        if existing_class:
+            return render_template('create_class.html', existing_class=existing_class, user=current_user, subjects=subjects)
 
         if subject_id and year_group:
             subject = Subject.query.get(subject_id)
@@ -290,8 +323,9 @@ def create_class():
         else:
             flash('Please fill out all fields', category='error')
 
-    subjects = Subject.query.all()
     return render_template("create_class.html", user=current_user, subjects=subjects)
+
+
 
 
 @auth.route('/student')
@@ -338,4 +372,11 @@ def request_join_class(student_id, class_id):
     return redirect(url_for('auth.student', student_id=student_id))
     
 
-
+# @auth.route('/request_join_class/<int:student_id>/<int:class_id>', methods=['GET'])
+# def request_join_class(student_id, class_id):
+#     # Create a new join request object
+#     join_request = JoinRequest(student_id=student_id, class_id=class_id, status='pending')
+#     db.session.add(join_request)
+#     db.session.commit()
+#     flash('Join request sent successfully', category='success')
+#     return redirect(url_for('auth.student', student_id=student_id))
