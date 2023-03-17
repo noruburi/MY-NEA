@@ -231,35 +231,35 @@ def sign_up():
 
 
 
-# @auth.route('/transactions', methods=['GET', 'POST'])
-# @login_required
-# def transactions():
-#     if current_user.is_admin() or current_user.is_teacher():
-#         students = User.query.filter_by(role_id=3).all()
-#         if request.method == 'POST':
-#             student_id = request.form['student_id']
-#             points = request.form['points']
-#             student_account = Account.query.filter_by(id=student_id).first()
-#             if student_account:
-#                 student_account.balance += int(points)
-#                 db.session.commit()
-#                 transaction = Transactions(
-#                     sequence=1,
-#                     from_account_id=current_user.id,
-#                     dateTime=datetime.utcnow(),
-#                     to_account_id=student_id,
-#                     amount=int(points)
-#                 )
-#                 db.session.add(transaction)
-#                 db.session.commit()
-#                 flash('Transaction successful!', 'success')
-#                 return redirect(url_for('auth.transactions'))
-#             else:
-#                 flash('Invalid student ID', 'danger')
+@auth.route('/transactions', methods=['GET', 'POST'])
+@login_required
+def transactions():
+    if current_user.is_admin() or current_user.is_teacher():
+        students = User.query.filter_by(role_id=3).all()
+        if request.method == 'POST':
+            student_id = request.form['student_id']
+            points = request.form['points']
+            student_account = Account.query.filter_by(id=student_id).first()
+            if student_account:
+                student_account.balance += int(points)
+                db.session.commit()
+                transaction = Transactions(
+                    sequence=1,
+                    from_account_id=current_user.id,
+                    dateTime=datetime.utcnow(),
+                    to_account_id=student_id,
+                    amount=int(points)
+                )
+                db.session.add(transaction)
+                db.session.commit()
+                flash('Transaction successful!', 'success')
+                return redirect(url_for('auth.transactions'))
+            else:
+                flash('Invalid student ID', 'danger')
 
 
-#     students = User.query.filter_by(role_id=3).all() # Assuming student role ID is 3
-#     return render_template('transactions.html', students=students, user=current_user)
+    students = User.query.filter_by(role_id=3).all() # Assuming student role ID is 3
+    return render_template('transactions.html', students=students, user=current_user)
 
 @auth.route('/create_class', methods=['GET', 'POST'])
 @login_required
