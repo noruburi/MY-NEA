@@ -1,6 +1,6 @@
 from . import db
 from flask_login import UserMixin
-
+from datetime import datetime
 
 class Role(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -18,7 +18,25 @@ class User(db.Model, UserMixin):
     role_approved = db.Column(db.Boolean, default=False)
     role_request = db.Column(db.Boolean, default=False)
     role_requested_on = db.Column(db.DateTime)
-    points_per_week = db.Column(db.Integer, default=0)
+    weekly_point_limit = db.Column(db.Integer, default=100)
+    points_awarded = db.Column(db.Integer, default=0)
+    last_award_date = db.Column(db.Date)
+
+    @property
+    def remaining_points(self):
+        today = datetime.utcnow().date()
+        if self.last_award_date and self.last_award_date.isocalendar()[1] == today.isocalendar()[1]:
+            return max(self.weekly_point_limit - self.points_awarded, 0)
+        else:
+            return self.weekly_point_limit
+
+    @property
+    def points_awarded_percentage(self):
+        return int(self.points_awarded / self.weekly_point_limit * 100)
+
+    @property
+    def remaining_point_percentage(self):
+        return int(self.remaining_points / self.weekly_point_limit * 100)
 
     def is_admin(self):
         return self.role.name == 'admin'

@@ -10,17 +10,19 @@ from sqlalchemy import and_
 auth = Blueprint('auth', __name__) #defines auth blueprint to create url
 
 
-
-# @auth.route('/landing')
-# def landing():
-#     return render_template("landing.html", user=current_user)
-
-
 @auth.route('/teacher')
 @login_required
 def teacher():
     join_requests = JoinRequest.query.join(User).filter(User.id == 3).all()
     return render_template('teacher.html', user=current_user, join_requests=join_requests)
+
+
+
+@auth.route('/join_request')
+@login_required
+def join_request():
+    join_requests = JoinRequest.query.join(User).filter(User.id == 3).all()
+    return render_template('join_request.html', user=current_user, join_requests=join_requests)
 
 
 
@@ -256,35 +258,59 @@ def sign_up():
     roles = Role.query.all()
     return render_template('sign_up.html',user=current_user, roles=roles)
 
+
+
 @auth.route('/award_points', methods=['GET', 'POST'])
 @login_required
 def award_points():
     if current_user.is_admin() or current_user.is_teacher():
         students = User.query.filter_by(role_id=3).all()
         if request.method == 'POST':
-            student_id = request.form['student_id']
-            points = request.form['points']
-            student_account = Account.query.filter_by(id=student_id).first()
-            if student_account:
-                student_account.balance += int(points)
-                db.session.commit()
-                transaction = Transactions(
-                    sequence=1,
-                    from_account_id=current_user.id,
-                    dateTime=datetime.utcnow(),
-                    to_account_id=student_id,
-                    amount=int(points)
-                )
-                db.session.add(transaction)
-                db.session.commit()
-                flash('Transaction successful!', 'success')
-                return redirect(url_for('auth.transactions'))
+            student_name = request.form['student_name']
+            class_name = request.form['class_name']
+            points = int(request.form['amount'])
+            
+            # Check if teacher has enough remaining points to award
+            if current_user.remaining_points < points:
+                flash('You do not have enough points to award.', 'danger')
+                return redirect(url_for('auth.award_points'))
+            
+            # Check if teacher has exceeded weekly point limit
+            if current_user.points_awarded_this_week >= current_user.weekly_point_limit:
+                flash('You have exceeded your weekly point limit.', 'danger')
+                return redirect(url_for('auth.award_points'))
+            
+            student = User.query.filter_by(first_name=student_name).first()
+            class_ = Class.query.filter_by(name=class_name, teacher=current_user).first()
+            if student and class_:
+                student_account = Account.query.filter_by(id=student.id).first()
+                if student_account:
+                    student_account.balance += points
+                    db.session.commit()
+                    transaction = Transactions(
+                        sequence=1,
+                        from_account_id=current_user.id,
+                        dateTime=datetime.utcnow(),
+                        to_account_id=student.id,
+                        amount=points
+                    )
+                    db.session.add(transaction)
+                    db.session.commit()
+                    flash('Transaction successful!', 'success')
+                    return redirect(url_for('auth.award_points'))
+                else:
+                    flash('Invalid student ID', 'danger')
             else:
-                flash('Invalid student ID', 'danger')
+                flash('Invalid student name or class name', 'danger')
 
+        # Calculate remaining points and percentage
+        remaining_points = current_user.remaining_points
+        remaining_point_percentage = current_user.remaining_point_percentage
         
-    students = User.query.filter_by(role_id=3).all()
-    return render_template('award_points.html', students=students, user=current_user)
+        # Render the template with the remaining points and percentage
+        return render_template('award_points.html', students=students, user=current_user, remaining_points=remaining_points, remaining_point_percentage=remaining_point_percentage)
+
+   
 
 
 

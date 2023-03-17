@@ -2,37 +2,35 @@
 
 {% block title %}Teacher page{% endblock %}
 {% block content %}
-
-
-
 <div class="container">
-  <h2>Join Requests</h2>
-  <table class="table table-striped">
-    <thead>
-      <tr>
-        <th>Student</th>
-        <th>Class</th>
-        <th>Status</th>
-        <th>Action</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for join_request in join_requests %}
-      <tr>
-        <td>{{ join_request.student.user_name }}</td>
-        <td>{{ join_request.class_.name }}</td>
-        <td>{{ join_request.status }}</td>
-        <td>
-          <a href="{{ url_for('auth.respond_join_request', join_request_id=join_request.id, action='accept') }}" class="btn btn-primary">Accept</a>
-          <a href="{{ url_for('auth.respond_join_request', join_request_id=join_request.id, action='reject') }}" class="btn btn-danger">Reject</a>
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+<div class="row">
+  <div class="col-md-6">
+    <div id="myChartContainer">
+      <canvas id="myChart"></canvas>
+    </div>
+    <p class="text-center mt-2">Points Remaining: {{ current_user.remaining_points }}</p>
+  </div>
 </div>
-
+<table>
+  <thead>
+    <tr>
+      <th>Class Name</th>
+      <th>Year Group</th>
+      <th>Subject</th>
+      <th>Points Awarded</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for class in classes %}
+      <tr>
+        <td>{{ class.name }}</td>
+        <td>{{ class.year_group }}</td>
+        <td>{{ class.subject }}</td>
+        <td>{{ class.points_awarded }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<script src="{{ url_for('static', filename='js/teacher.js') }}"></script>
+</div>
 {% endblock %}
-
-
-
