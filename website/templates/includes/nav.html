@@ -8,7 +8,7 @@
   <a class="nav-item nav-link" id="login" href="/create_class">class creation</a>
   <a class="nav-item nav-link" id="logout" href="/logout">Logout</a>
   {% elif user.is_authenticated and user.role.name == 'student' %}
-  <a class="nav-item nav-link" id="login" href="{{ url_for('auth.student', student_id=user.id) }}">Student</a>
+  <a class="nav-item nav-link" id="login" href="/student">Student</a>
   <a class="nav-item nav-link" id="logout" href="/logout">Logout</a>
 {% else %}
   <a class="nav-item nav-link" id="login" href="/landing">Home</a>

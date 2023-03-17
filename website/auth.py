@@ -15,19 +15,6 @@ auth = Blueprint('auth', __name__) #defines auth blueprint to create url
 def landing():
     return render_template("landing.html", user=current_user)
 
-# @auth.route('/teacher')
-# @login_required
-# def teacher():
-#     # Fetch classes created by the current user (teacher)
-#     classes = Class.query.filter_by(teacher_id=current_user.id).all()
-
-#     # Fetch student join requests for each class
-#     join_requests = {}
-#     for class_obj in classes:
-#         join_requests[class_obj.id] = JoinRequest.query.filter_by(class_id=class_obj.id).all()
-
-#     return render_template('teacher.html', user=current_user, classes=classes, join_requests=join_requests)
-
 
 @auth.route('/teacher')
 @login_required
@@ -60,8 +47,8 @@ def login():
                         return redirect(url_for('auth.teacher'))
                 elif role.name == "student":
                     flash('Logged in as student successfully!', category='success')
-                login_user(user, remember=True)
-                return redirect(url_for('views.home'))
+                    login_user(user, remember=True)
+                    return redirect(url_for('auth.student', student_id=user.id))
             else:
                 flash('Incorrect password, try again.', category='error')
         else:
@@ -244,35 +231,35 @@ def sign_up():
 
 
 
-@auth.route('/transactions', methods=['GET', 'POST'])
-@login_required
-def transactions():
-    if current_user.is_admin() or current_user.is_teacher():
-        students = User.query.filter_by(role_id=3).all()
-        if request.method == 'POST':
-            student_id = request.form['student_id']
-            points = request.form['points']
-            student_account = Account.query.filter_by(id=student_id).first()
-            if student_account:
-                student_account.balance += int(points)
-                db.session.commit()
-                transaction = Transactions(
-                    sequence=1,
-                    from_account_id=current_user.id,
-                    dateTime=datetime.utcnow(),
-                    to_account_id=student_id,
-                    amount=int(points)
-                )
-                db.session.add(transaction)
-                db.session.commit()
-                flash('Transaction successful!', 'success')
-                return redirect(url_for('auth.transactions'))
-            else:
-                flash('Invalid student ID', 'danger')
+# @auth.route('/transactions', methods=['GET', 'POST'])
+# @login_required
+# def transactions():
+#     if current_user.is_admin() or current_user.is_teacher():
+#         students = User.query.filter_by(role_id=3).all()
+#         if request.method == 'POST':
+#             student_id = request.form['student_id']
+#             points = request.form['points']
+#             student_account = Account.query.filter_by(id=student_id).first()
+#             if student_account:
+#                 student_account.balance += int(points)
+#                 db.session.commit()
+#                 transaction = Transactions(
+#                     sequence=1,
+#                     from_account_id=current_user.id,
+#                     dateTime=datetime.utcnow(),
+#                     to_account_id=student_id,
+#                     amount=int(points)
+#                 )
+#                 db.session.add(transaction)
+#                 db.session.commit()
+#                 flash('Transaction successful!', 'success')
+#                 return redirect(url_for('auth.transactions'))
+#             else:
+#                 flash('Invalid student ID', 'danger')
 
 
-    students = User.query.filter_by(role_id=3).all() # Assuming student role ID is 3
-    return render_template('transactions.html', students=students, user=current_user)
+#     students = User.query.filter_by(role_id=3).all() # Assuming student role ID is 3
+#     return render_template('transactions.html', students=students, user=current_user)
 
 @auth.route('/create_class', methods=['GET', 'POST'])
 @login_required
@@ -307,41 +294,36 @@ def create_class():
     return render_template("create_class.html", user=current_user, subjects=subjects)
 
 
-# @auth.route('/student/<int:student_id>', methods=['GET'])
-# def student(student_id):
-#     student = User.query.filter_by(id=student_id, role_id=3).all()
-#     classes = Class.query.all()
-#     return render_template('student.html', student=student, classes=classes)
-
-
-
-@auth.route('/student/<int:student_id>', methods=['GET'])
-def student(student_id):
-    student = User.query.filter_by(id=student_id, role_id=3).first_or_404()
-    print("student: ", student)
-    
-    search_year_group = request.args.get('year_group', type=int)
-    search_subject_id = request.args.get('subject_id', type=int)
-    search_teacher_id = request.args.get('teacher_id', type=int)  # New filter
-    
-    search_filters = []
-    if search_year_group:
-        search_filters.append(Class.year_group == search_year_group)
-    if search_subject_id:
-        search_filters.append(Class.subject_id == search_subject_id)
-    if search_teacher_id:  # Add the filter for teacher_id
-        search_filters.append(Class.teacher_id == search_teacher_id)
-    
-    if search_filters:
-        classes = Class.query.filter(and_(*search_filters)).all()
-    else:
-        classes = Class.query.all()
+@auth.route('/student')
+@login_required
+def student():
+    student = User.query.filter_by(id=current_user.id, role_id=3).first()
+    if student:
+        search_year_group = request.args.get('year_group', type=int)
+        search_subject_id = request.args.get('subject_id', type=int)
+        search_teacher_id = request.args.get('teacher_id', type=int)  # New filter
         
-    subjects = Subject.query.all()
-    teachers = User.query.filter_by(role_id=2).all()  # Fetch all teachers
+        search_filters = []
+        if search_year_group:
+            search_filters.append(Class.year_group == search_year_group)
+        if search_subject_id:
+            search_filters.append(Class.subject_id == search_subject_id)
+        if search_teacher_id:  # Add the filter for teacher_id
+            search_filters.append(Class.teacher_id == search_teacher_id)
+        
+        if search_filters:
+            classes = Class.query.filter(and_(*search_filters)).all()
+        else:
+            classes = Class.query.all()
+            
+        subjects = Subject.query.all()
+        teachers = User.query.filter_by(role_id=2).all()  # Fetch all teachers
+        
+        return render_template('student.html', student=student, classes=classes, user=current_user, search_year_group=search_year_group, search_subject_id=search_subject_id, search_teacher_id=search_teacher_id, subjects=subjects, teachers=teachers)
+    else:
+        flash('You are not a student!', category='error')
+        return redirect(url_for('views.home'))
 
-    print("classes: ", classes)
-    return render_template('student.html', student=student, classes=classes, user=current_user, search_year_group=search_year_group, search_subject_id=search_subject_id, search_teacher_id=search_teacher_id, subjects=subjects, teachers=teachers)
 
 
 
