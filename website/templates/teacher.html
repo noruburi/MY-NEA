@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
-{% block title %}Teacher page{% endblock %}
+
+  <title>{% block title %}Teacher page{% endblock %}</title>
 
 {% block content %}
 <div class="container">
@@ -12,33 +13,116 @@
       <p class="text-center mt-2">Points Remaining: {{ current_user.remaining_points }}</p>
     </div>
     <div class="col-md-6">
+      <div class="form-group">
+        <label for="filter">Select a class or year group:</label>
+        <select id="filter">
+          <option value="all">All</option>
+          {% for year_group in year_groups %}
+            <option value="{{ year_group }}">{{ year_group }}</option>
+          {% endfor %}
+          {% for class_name in class_names %}
+            <option value="{{ class_name }}">{{ class_name }}</option>
+          {% endfor %}
+        </select>
+      </div>
       <div id="barChartContainer">
         <canvas id="barChart"></canvas>
       </div>
     </div>
   </div>
-  <table>
-    <thead>
-      <tr>
-        <th>Class Name</th>
-        <th>Year Group</th>
-        <th>Subject</th>
-        <th>Points Awarded</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for class in classes %}
-        <tr>
-          <td>{{ class.name }}</td>
-          <td>{{ class.year_group }}</td>
-          <td>{{ class.subject }}</td>
-          <td>{{ class.points_awarded }}</td>
-        </tr>
-      {% endfor %}
-    </tbody>
-  </table>
 </div>
 
-<script src="{{ url_for('static', filename='js/Chart.min.js') }}"></script>
-<script src="{{ url_for('static', filename='js/teacher.js') }}"></script>
+
+<script>
+  var ctx = document.getElementById('pieChart').getContext('2d');
+  var myChart = new Chart(ctx, {
+      type: 'pie',
+      data: {
+          labels: ['Points Awarded', 'Points Remaining'],
+          datasets: [{
+              label: 'Points',
+              data: [{{ current_user.points_awarded }}, {{ current_user.remaining_points }}],
+              backgroundColor: [
+                  'rgba(255, 99, 132, 0.2)',
+                  'rgba(54, 162, 235, 0.2)'
+              ],
+              borderColor: [
+                  'rgba(255, 99, 132, 1)',
+                  'rgba(54, 162, 235, 1)'
+              ],
+              borderWidth: 1
+          }]
+      },
+      options: {
+          responsive: true,
+          maintainAspectRatio: false
+      }
+  });
+  </script>
+
+<script>
+  var classes;
+  {% if classes %}
+  classes = JSON.parse('{{ classes | tojson | safe }}');
+  {% else %}
+  classes = [];
+  {% endif %}
+
+  function filterData(data, filterValue) {
+    if (filterValue === 'all') {
+      return data;
+    } else {
+      return data.filter(function(d) {
+        return d.year_group === filterValue || d.name === filterValue;
+      });
+    }
+  }
+
+  function createBarChart(filterValue) {
+  var filteredData = filterData(classes, filterValue);
+  var ctx = document.getElementById('barChart').getContext('2d');
+  var myChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: filteredData.map(function(d) { return d.name; }),
+      datasets: [{
+        label: 'Points Awarded',
+        data: filteredData.map(function(d) { return d.points_awarded; }),
+        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+        borderColor: 'rgba(255, 99, 132, 1)',
+        borderWidth: 1
+      }, {
+        label: 'Points Remaining',
+        data: filteredData.map(function(d) { return d.remaining_points; }),
+        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+        borderColor: 'rgba(54, 162, 235, 1)',
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        yAxes: [{
+          ticks: {
+            beginAtZero: true
+          }
+        }]
+      }
+    }
+  });
+}
+
+
+  createBarChart('all');
+
+  document.getElementById('filter').addEventListener('change', function() {
+    var filterValue = this.value;
+    var ctx = document.getElementById('barChart').getContext('2d');
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    createBarChart(filterValue);
+  });
+</script>
+
+    
 {% endblock %}

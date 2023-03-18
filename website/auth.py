@@ -14,7 +14,8 @@ auth = Blueprint('auth', __name__) #defines auth blueprint to create url
 @login_required
 def teacher():
     join_requests = JoinRequest.query.join(User).filter(User.id == 3).all()
-    return render_template('teacher.html', user=current_user, join_requests=join_requests)
+    classes = Class.query.all()
+    return render_template('teacher.html', user=current_user, join_requests=join_requests, classes=classes)
 
 
 
