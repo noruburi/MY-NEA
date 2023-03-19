@@ -16,14 +16,26 @@
       </tr>
     </thead>
     <tbody>
-      {% for class in classes %}
+    {% for class in classes %}
       <tr>
-        <td>{{ class.class_name() }}</td> <!-- Display the generated class name -->
+        <td>{{ class.class_name() }}</td>
         <td>{{ class.subject.name }}</td>
         <td>{{ class.year_group }}</td>
-        <td><a href="{{ url_for('auth.request_join_class', student_id=student.id, class_id=class.id) }}" class="btn btn-primary">Request to Join</a></td>
+        <td>
+            {% set existing_join_request = none %}
+            {% for join_request in join_requests %}
+                {% if join_request.class_id == class.id %}
+                    {% set existing_join_request = join_request %}
+                {% endif %}
+            {% endfor %}
+            {% if existing_join_request %}
+                <button class="btn btn-primary" disabled>Requested</button>
+            {% else %}
+                <a href="{{ url_for('auth.request_join_class', student_id=student.id, class_id=class.id) }}" class="btn btn-primary">Request to Join</a>
+            {% endif %}
+        </td>
       </tr>
-      {% endfor %}
+    {% endfor %}
     </tbody>
   </table>
 </div>
