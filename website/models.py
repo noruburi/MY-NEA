@@ -1,6 +1,8 @@
 from . import db
 from flask_login import UserMixin
-from datetime import datetime
+from datetime import datetime, timedelta
+import random
+import string
 
 class Role(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -18,6 +20,7 @@ class User(db.Model, UserMixin):
     role_approved = db.Column(db.Boolean, default=False)
     role_request = db.Column(db.Boolean, default=False)
     role_requested_on = db.Column(db.DateTime)
+    account_id = db.Column(db.Integer, db.ForeignKey('account.id'))
     weekly_point_limit = db.Column(db.Integer, default=100)
     points_awarded = db.Column(db.Integer, default=0)
     last_award_date = db.Column(db.Date)
@@ -46,6 +49,8 @@ class User(db.Model, UserMixin):
 
 class Account(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user = db.relationship('User', foreign_keys=[user_id], backref=db.backref('account', lazy=True))
     balance = db.Column(db.Integer)
 
 class Transactions(db.Model, UserMixin):
@@ -104,3 +109,43 @@ class JoinRequest(db.Model):
     class_ = db.relationship('Class', backref=db.backref('join_requests', lazy=True))
     status = db.Column(db.String(20), nullable=False)
     __table_args__ = (db.UniqueConstraint('student_id', 'class_id'),)
+
+class Coupon(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    student_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    student = db.relationship('User', backref=db.backref('coupons', lazy=True))
+    name = db.Column(db.String(50), nullable=False)
+    description = db.Column(db.String(200), nullable=False)
+    points_cost = db.Column(db.Integer, nullable=False)
+    code = db.Column(db.String(8), nullable=False, unique=True)
+    redeemed = db.Column(db.Boolean, nullable=False, default=False)
+    redeem_date = db.Column(db.DateTime)
+
+
+    def __init__(self, student_id, name, description, points_cost, code=None, redeemed=False, redeem_date=None):
+        self.student_id = student_id
+        self.name = name
+        self.description = description
+        self.points_cost = points_cost
+        self.code = code or self.generate_code()
+        self.redeemed = redeemed
+        self.redeem_date = redeem_date
+
+    def generate_code(self):
+        code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
+        while Coupon.query.filter_by(code=code).first() is not None:
+            code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
+        return code
+
+    def redeem(self):
+        self.redeemed = True
+        self.redeem_date = datetime.utcnow()
+
+    @property
+    def is_expired(self):
+        if self.redeem_date is None:
+            return False
+        return (datetime.utcnow() - self.redeem_date) > timedelta(days=2)
+
+    def __repr__(self):
+        return f'<Coupon {self.name}>'

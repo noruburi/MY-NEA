@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for
 from flask_login import login_user, current_user, logout_user, login_required
 from werkzeug.security import check_password_hash, generate_password_hash
-from .models import User, Role, Transactions, TeacherRequestHistory, Account, Class, Subject, JoinRequest
+from .models import User, Role, Transactions, TeacherRequestHistory, Account, Class, Subject, JoinRequest, Coupon
 from . import db
 from sqlalchemy.exc import IntegrityError
 from datetime import datetime
@@ -47,7 +47,7 @@ def login():
                     else:
                         flash('Logged in as teacher successfully!', category='success')
                         login_user(user, remember=True)
-                        return redirect(url_for('auth.teacher'))
+                        return redirect(url_for('auth.award_points'))
                 elif role.name == "student":
                     flash('Logged in as student successfully!', category='success')
                     login_user(user, remember=True)
@@ -261,29 +261,81 @@ def sign_up():
 
 
 
+# @auth.route('/award_points', methods=['GET', 'POST'])
+# @login_required
+# def award_points():
+#     if current_user.is_admin() or current_user.is_teacher():
+#         students = User.query.filter_by(role_id=3).all()
+#         if request.method == 'POST':
+#             student_name = request.form['student_name']
+#             class_name = request.form['class_name']
+#             points = int(request.form['amount'])
+            
+#             # Check if teacher has enough remaining points to award
+#             if current_user.remaining_points < points:
+#                 flash('You do not have enough points to award.', 'danger')
+#                 return redirect(url_for('auth.award_points'))
+            
+#             # Check if teacher has exceeded weekly point limit
+#             if current_user.points_awarded_this_week >= current_user.weekly_point_limit:
+#                 flash('You have exceeded your weekly point limit.', 'danger')
+#                 return redirect(url_for('auth.award_points'))
+            
+#             student = User.query.filter_by(first_name=student_name).first()
+#             class_ = Class.query.filter_by(name=class_name, teacher=current_user).first()
+#             if student and class_:
+#                 if student.account:
+#                     student.account.balance += points
+#                     db.session.commit()
+#                     transaction = Transactions(
+#                         sequence=1,
+#                         from_account_id=current_user.id,
+#                         dateTime=datetime.utcnow(),
+#                         to_account_id=student.id,
+#                         amount=points
+#                     )
+#                     db.session.add(transaction)
+#                     db.session.commit()
+#                     flash('Transaction successful!', 'success')
+#                     return redirect(url_for('auth.award_points'))
+#                 else:
+#                     flash('Invalid student ID', 'danger')
+#             else:
+#                 flash('Invalid student name or class name', 'danger')
+
+#         # Calculate remaining points and percentage
+#         remaining_points = current_user.remaining_points
+#         remaining_point_percentage = current_user.remaining_point_percentage
+        
+#         # Render the template with the remaining points and percentage
+#         return render_template('award_points.html', students=students, user=current_user, remaining_points=remaining_points, remaining_point_percentage=remaining_point_percentage)
+
+   
 @auth.route('/award_points', methods=['GET', 'POST'])
 @login_required
 def award_points():
     if current_user.is_admin() or current_user.is_teacher():
+        year_groups = db.session.query(Class.year_group).distinct().all()
+        classes = Class.query.filter_by(teacher=current_user).all()
         students = User.query.filter_by(role_id=3).all()
+
         if request.method == 'POST':
-            student_name = request.form['student_name']
-            class_name = request.form['class_name']
+            year_group = request.form['year_group']
+            class_id = request.form['class_id']
+            student_id = request.form['student_id']
             points = int(request.form['amount'])
-            
-            # Check if teacher has enough remaining points to award
+
             if current_user.remaining_points < points:
                 flash('You do not have enough points to award.', 'danger')
                 return redirect(url_for('auth.award_points'))
-            
-            # Check if teacher has exceeded weekly point limit
+
             if current_user.points_awarded_this_week >= current_user.weekly_point_limit:
                 flash('You have exceeded your weekly point limit.', 'danger')
                 return redirect(url_for('auth.award_points'))
-            
-            student = User.query.filter_by(first_name=student_name).first()
-            class_ = Class.query.filter_by(name=class_name, teacher=current_user).first()
-            if student and class_:
+
+            student = User.query.filter_by(id=student_id, role_id=3).first()
+
+            if student:
                 student_account = Account.query.filter_by(id=student.id).first()
                 if student_account:
                     student_account.balance += points
@@ -304,14 +356,12 @@ def award_points():
             else:
                 flash('Invalid student name or class name', 'danger')
 
-        # Calculate remaining points and percentage
         remaining_points = current_user.remaining_points
         remaining_point_percentage = current_user.remaining_point_percentage
-        
-        # Render the template with the remaining points and percentage
-        return render_template('award_points.html', students=students, user=current_user, remaining_points=remaining_points, remaining_point_percentage=remaining_point_percentage)
 
-   
+        return render_template('award_points.html', year_groups=year_groups, classes=classes, students=students, user=current_user, remaining_points=remaining_points, remaining_point_percentage=remaining_point_percentage)
+    else:
+        return "You are not authorized to access this page."
 
 
 
@@ -397,13 +447,60 @@ def request_join_class(student_id, class_id):
 
     flash('Join request sent successfully', category='success')
     return redirect(url_for('auth.student', student_id=student_id))
-    
 
-# @auth.route('/request_join_class/<int:student_id>/<int:class_id>', methods=['GET'])
-# def request_join_class(student_id, class_id):
-#     # Create a new join request object
-#     join_request = JoinRequest(student_id=student_id, class_id=class_id, status='pending')
-#     db.session.add(join_request)
-#     db.session.commit()
-#     flash('Join request sent successfully', category='success')
-#     return redirect(url_for('auth.student', student_id=student_id))
+
+# @auth.route('/student_rewards', methods=['GET', 'POST'])
+# @login_required
+# def student_rewards():
+#     student = User.query.filter_by(id=current_user.id, role_id=3).first()
+#     if student:
+#         available_items = [
+#             {'name': 'Pen', 'description': 'A nice pen', 'points': 10},
+#             {'name': 'Notebook', 'description': 'A useful notebook', 'points': 20},
+#             {'name': 'Coffee', 'description': 'A cup of coffee', 'points': 30},
+#             {'name': 'Lunch', 'description': 'A delicious lunch', 'points': 50},
+#         ]
+#         if request.method == 'POST':
+#             item_index = int(request.form.get('item_index'))
+#             item = available_items[item_index]
+#             if current_user.remaining_points >= item['points']:
+#                 coupon_code = None  # TODO: Generate unique 8-digit code
+#                 coupon = Coupon(student_id=student.id, name=item['name'], description=item['description'], points_cost=item['points'], code=coupon_code, redeemed=False, redeem_date=None)
+#                 db.session.add(coupon)
+#                 db.session.commit()
+#                 flash('Coupon purchased successfully!', 'success')
+#             else:
+#                 flash('You do not have enough points to purchase this item', 'error')
+#     else:
+#         flash('You are not a student!', category='error')
+#         return redirect(url_for('views.home'))
+            
+#     return render_template('student_rewards.html', available_items=available_items, student=student, user=current_user)
+
+@auth.route('/student_rewards', methods=['GET', 'POST'])
+@login_required
+def student_rewards():
+    student = User.query.filter_by(id=current_user.id, role_id=3).first()
+    if student:
+        available_items = [
+            {'name': 'Pen', 'points': 10},
+            {'name': 'Notebook', 'points': 20},
+            {'name': 'Coffee', 'points': 30},
+            {'name': 'Lunch', 'points': 50},
+        ]
+        if request.method == 'POST':
+            item_index = int(request.form.get('item_index'))
+            item = available_items[item_index]
+            if student.balance >= item['points']:
+                coupon_code = None  # TODO: Generate unique 8-digit code
+                coupon = Coupon(student_id=student.id, name=item['name'], description=item['description'], points_cost=item['points'], code=coupon_code, redeemed=False, redeem_date=None)
+                db.session.add(coupon)
+                db.session.commit()
+                flash('Coupon purchased successfully!', 'success')
+            else:
+                flash('You do not have enough points to purchase this item', 'error')
+    else:
+        flash('You are not a student!', category='error')
+        return redirect(url_for('views.home'))
+            
+    return render_template('student_rewards.html', available_items=available_items, student=student, user=current_user)

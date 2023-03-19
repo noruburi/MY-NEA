@@ -15,7 +15,7 @@
             </div>
           </div>
         </div>
-        
+        {% endif %}     
         <div class="col-md-8">
           <div class="card mb-4">
             <div class="card-body">
@@ -39,39 +39,79 @@
         </div>
       </div>
 
-      <form method="POST" action="{{ url_for('auth.award_points') }}">
-        <div class="form-group">
-          <label for="student_name">Student Name:</label>
-          <input type="text" class="form-control" id="student_name" name="student_name" required>
-        </div>
-        <div class="form-group">
-          <label for="class_name">Class Name:</label>
-          <input type="text" class="form-control" id="class_name" name="class_name" required>
-        </div>
-        <div class="form-group">
-          <label for="amount">Amount:</label>
-          <input type="number" class="form-control" id="amount" name="amount" min="1" max="{{ current_user.remaining_points }}" required>
-        </div>
-        <button type="submit" class="btn btn-primary">Award Points</button>
-      </form>
-
-      {% if errors %}
-        <div class="alert alert-danger mt-3" role="alert">
-          {{ errors }}
-        </div>
-      {% endif %}
-
-      {% if success %}
-        <div class="alert alert-success mt-3" role="alert">
-          {{ success }}
-        </div>
-      {% endif %}
-
-    {% else %}
-      <div class="alert alert-danger mt-3" role="alert">
-        You must be a teacher to access this page.
+      <div class="container">
+        <form method="POST" action="{{ url_for('auth.award_points') }}">
+            <div class="form-group">
+              <label for="year_group">Year Group:</label>
+              <select class="form-control" id="year_group" name="year_group" required>
+                <option value="">Select a year group</option>
+                {% for year_group in year_groups %}
+                  <option value="{{ year_group.year_group }}">{{ year_group.year_group }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="class_id">Class:</label>
+              <select class="form-control" id="class_id" name="class_id" required>
+                <option value="">Select a class</option>
+                {% for class in classes %}
+                  <option value="{{ class.id }}">{{ class.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="student_id">Student:</label>
+              <select class="form-control" id="student_id" name="student_id" required>
+                <option value="">Select a student</option>
+                {% for student in students %}
+                  <option value="{{ student.id }}">{{ student.first_name }} {{ student.last_name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="amount">Amount:</label>
+              <input type="number" class="form-control" id="amount" name="amount" min="1" max="{{ current_user.remaining_points }}" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Award Points</button>
+          </form>
       </div>
-    {% endif %}
 
-   
+
+      <div class="container">
+        <div class="row">
+          <div class="col-md-6">
+            <div id="pieChartContainer">
+              <canvas id="pieChart"></canvas>
+            </div>
+            <p class="text-center mt-2">Points Remaining: {{ current_user.remaining_points }}</p>
+          </div>
+        </div>
+      </div>
+
+    <script>
+      var ctx = document.getElementById('pieChart').getContext('2d');
+      var myChart = new Chart(ctx, {
+          type: 'pie',
+          data: {
+              labels: ['Points Awarded', 'Points Remaining'],
+              datasets: [{
+                  label: 'Points',
+                  data: [{{ current_user.points_awarded }}, {{ current_user.remaining_points }}],
+                  backgroundColor: [
+                      'rgba(255, 99, 132, 0.2)',
+                      'rgba(54, 162, 235, 0.2)'
+                  ],
+                  borderColor: [
+                      'rgba(255, 99, 132, 1)',
+                      'rgba(54, 162, 235, 1)'
+                  ],
+                  borderWidth: 1
+              }]
+          },
+          options: {
+              responsive: true,
+              maintainAspectRatio: false
+          }
+      });
+    </script> 
 {% endblock %}
