@@ -24,6 +24,7 @@ class User(db.Model, UserMixin):
     weekly_point_limit = db.Column(db.Integer, default=100)
     points_awarded = db.Column(db.Integer, default=0)
     last_award_date = db.Column(db.Date)
+    points_awarded_this_week = db.Column(db.Integer, default=0)
 
     @property
     def remaining_points(self):
