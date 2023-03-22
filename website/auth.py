@@ -9,22 +9,7 @@ from sqlalchemy import and_
 
 auth = Blueprint('auth', __name__) #defines auth blueprint to create url
 
-
-@auth.route('/teacher')
-@login_required
-def teacher():
-    join_requests = JoinRequest.query.join(User).filter(User.id == 3).all()
-    classes = Class.query.all()
-    return render_template('teacher.html', user=current_user, join_requests=join_requests, classes=classes)
-
-
-
-@auth.route('/join_request')
-@login_required
-def join_request():
-    join_requests = JoinRequest.query.join(User).filter(User.id == 3).all()
-    return render_template('join_request.html', user=current_user, join_requests=join_requests)
-
+#//login and sign-up-------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 @auth.route('/login', methods=['GET', 'POST'])
@@ -60,101 +45,6 @@ def login():
     return render_template('login.html', user=current_user)
 
 
-@auth.route('/admin')
-def admin_page():
-    # Get all transactions
-    transactions = db.session.query(Transactions).all()
-
-    # Get all pending teacher requests
-    teacher_requests = User.query.filter(User.role.has(name='teacher'), User.role_request==True).all()
-
-    # Render the admin page and pass in the transactions and teacher_requests
-    return render_template('admin.html', user=current_user, transactions=transactions, teacher_requests=teacher_requests)
-
-
-
-@auth.route('/admin/update-teacher-request', methods=['POST'])
-@login_required
-def update_teacher_request():
-    user_id = request.form['user_id']
-    user = User.query.get(user_id)
-
-    if user is None or not user.role_request or user.role.name != 'teacher':
-        flash('Invalid request.', 'error')
-        return redirect(url_for('auth.admin_page'))
-
-    if not current_user.is_admin():
-        flash('You are not authorized to approve or reject teacher requests.', 'error')
-        return redirect(url_for('auth.admin_page'))
-
-    action = request.form['action']
-    if action == 'approve':
-        user.role_approved = True
-        user.role_request = False
-        db.session.commit()
-        flash(f'Teacher role request for {user.email} has been approved.', 'success')
-        status = 'accepted'
-    elif action == 'reject':
-        user.role_rejected = True
-        user.role_request = False
-        db.session.commit()
-        flash(f'Teacher role request for {user.email} has been rejected.', 'success')
-        status = 'rejected'
-
-    # Add a check to see if date_requested is None, and set it to the current time if it is
-    date_requested = user.role_requested_on
-
-    history_entry = TeacherRequestHistory(
-        user=user,
-        status=status,
-        date_resolved=datetime.utcnow(),
-        resolved_by=current_user
-    )
-    db.session.add(history_entry)
-    db.session.commit()
-
-    return redirect(url_for('auth.admin_page'))
-
-
-@auth.route('/teacher_requests_history')
-@login_required
-def view_teacher_requests():
-    requests = TeacherRequestHistory.query.join(User, TeacherRequestHistory.user_id == User.id).order_by(User.role_requested_on).all()
-    return render_template('teacher_requests_history.html', requests=requests, user=current_user)
-
-@auth.route('/respond_join_request/<int:join_request_id>/<string:action>', methods=['GET'])
-@login_required
-def respond_join_request(join_request_id, action):
-    # Get the join request object
-    join_request = JoinRequest.query.get_or_404(join_request_id)
-
-    # Check if the current user is the teacher of the class
-    if current_user.id != join_request.class_.teacher_id:
-        flash('You are not authorized to respond to this join request!', category='error')
-        return redirect(url_for('auth.teacher'))
-
-    # Update the status of the join request
-    if action == 'accept':
-        join_request.status = 'accepted'
-        flash('Join request accepted!', category='success')
-    elif action == 'reject':
-        join_request.status = 'rejected'
-        flash('Join request rejected!', category='success')
-    else:
-        flash('Invalid action!', category='error')
-        return redirect(url_for('auth.teacher'))
-
-    # Commit the changes to the database
-    db.session.commit()
-
-    # Redirect to the teacher dashboard
-    return redirect(url_for('auth.teacher'))
-
-@auth.route('/logout')
-@login_required
-def logout():
-    logout_user()
-    return redirect(url_for('auth.login'))
 
 
 def password_strength(password):
@@ -260,6 +150,138 @@ def sign_up():
     return render_template('sign_up.html',user=current_user, roles=roles)
 
 
+@auth.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('auth.login'))
+
+
+
+#//login and sign-up-------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+#//admin--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+@auth.route('/admin')
+def admin_page():
+    # Get all transactions
+    transactions = db.session.query(Transactions).all()
+
+    # Get all pending teacher requests
+    teacher_requests = User.query.filter(User.role.has(name='teacher'), User.role_request==True).all()
+
+    # Render the admin page and pass in the transactions and teacher_requests
+    return render_template('admin.html', user=current_user, transactions=transactions, teacher_requests=teacher_requests)
+
+
+
+@auth.route('/admin/update-teacher-request', methods=['POST'])
+@login_required
+def update_teacher_request():
+    user_id = request.form['user_id']
+    user = User.query.get(user_id)
+
+    if user is None or not user.role_request or user.role.name != 'teacher':
+        flash('Invalid request.', 'error')
+        return redirect(url_for('auth.admin_page'))
+
+    if not current_user.is_admin():
+        flash('You are not authorized to approve or reject teacher requests.', 'error')
+        return redirect(url_for('auth.admin_page'))
+
+    action = request.form['action']
+    if action == 'approve':
+        user.role_approved = True
+        user.role_request = False
+        db.session.commit()
+        flash(f'Teacher role request for {user.email} has been approved.', 'success')
+        status = 'accepted'
+    elif action == 'reject':
+        user.role_rejected = True
+        user.role_request = False
+        db.session.commit()
+        flash(f'Teacher role request for {user.email} has been rejected.', 'success')
+        status = 'rejected'
+
+    # Add a check to see if date_requested is None, and set it to the current time if it is
+    date_requested = user.role_requested_on
+
+    history_entry = TeacherRequestHistory(
+        user=user,
+        status=status,
+        date_resolved=datetime.utcnow(),
+        resolved_by=current_user
+    )
+    db.session.add(history_entry)
+    db.session.commit()
+
+    return redirect(url_for('auth.admin_page'))
+
+
+@auth.route('/teacher_requests_history')
+@login_required
+def view_teacher_requests():
+    requests = TeacherRequestHistory.query.join(User, TeacherRequestHistory.user_id == User.id).order_by(User.role_requested_on).all()
+    return render_template('teacher_requests_history.html', requests=requests, user=current_user)
+
+#//admin--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+#//teacher--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+@auth.route('/teacher')
+@login_required
+def teacher():
+    join_requests = JoinRequest.query.join(User).filter(User.id == 3).all()
+    classes = Class.query.all()
+    return render_template('teacher.html', user=current_user, join_requests=join_requests, classes=classes)
+
+
+
+@auth.route('/join_request')
+@login_required
+def join_request():
+    filter = request.args.get('filter', 'all')
+    
+    if filter == 'pending':
+        join_requests = JoinRequest.query.join(User).filter(User.id == 3, JoinRequest.status == 'pending').all()
+    elif filter == 'accepted_rejected':
+        join_requests = JoinRequest.query.join(User).filter(User.id == 3, (JoinRequest.status == 'accepted') | (JoinRequest.status == 'rejected')).all()
+    else:  # Default: Show all requests
+        join_requests = JoinRequest.query.join(User).filter(User.id == 3).all()
+
+    return render_template('join_request.html', user=current_user, join_requests=join_requests, filter=filter)
+
+
+
+@auth.route('/respond_join_request/<int:join_request_id>/<string:action>', methods=['GET'])
+@login_required
+def respond_join_request(join_request_id, action):
+    # Get the join request object
+    join_request = JoinRequest.query.get_or_404(join_request_id)
+
+    # Check if the current user is the teacher of the class
+    if current_user.id != join_request.class_.teacher_id:
+        flash('You are not authorized to respond to this join request!', category='error')
+        return redirect(url_for('auth.join_request'))
+
+    # Update the status of the join request
+    if action == 'accept':
+        join_request.status = 'accepted'
+        flash('Join request accepted!', category='success')
+    elif action == 'reject':
+        join_request.status = 'rejected'
+        flash('Join request rejected!', category='success')
+    else:
+        flash('Invalid action!', category='error')
+        return redirect(url_for('auth.join_request'))
+
+    # Commit the changes to the database
+    db.session.commit()
+
+    # Redirect to the teacher dashboard
+    return redirect(url_for('auth.join_request'))
 
 
 @auth.route('/award_points', methods=['GET', 'POST'])
@@ -353,7 +375,11 @@ def create_class():
 
     return render_template("create_class.html", user=current_user, subjects=subjects)
 
+#//teacher--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+
+
+#//student--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 @auth.route('/student/<int:student_id>')
@@ -436,3 +462,5 @@ def student_rewards():
         return redirect(url_for('views.home'))
             
     return render_template('student_rewards.html', available_items=available_items, student=student, user=current_user)
+
+#//student--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
