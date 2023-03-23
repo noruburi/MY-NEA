@@ -98,7 +98,6 @@ def sign_up():
         password2 = request.form.get('password2')
         role = request.form.get('role')
 
-
         if len(email) < 4:
             flash('Email must be greater than 3 characters.', category='error')
         elif contains_digit(first_name) or contains_digit(last_name) or len(first_name) < 2 or len(last_name) < 2:
@@ -118,7 +117,7 @@ def sign_up():
                 if role is None:
                     flash('Invalid role selected', category='error')
                     return redirect(url_for('auth.sign_up'))
-                
+
                 user_name = generate_username(first_name, last_name)
 
                 role_request = request.form.get('role') == 'teacher'
@@ -128,11 +127,17 @@ def sign_up():
                 try:
                     db.session.add(new_user)
                     db.session.commit()
+
+                    # Create a new account for the user
+                    account = Account(user=new_user, balance=0)
+                    db.session.add(account)
+                    db.session.commit()
+
                 except IntegrityError:
                     db.session.rollback()
                     flash('Email address already exists', category='error')
                     return redirect(url_for('auth.sign_up'))
-                
+
                 if role_request:
                     # Create a new TeacherRequestHistory object with the user_id and status set to 'Pending'
                     teacher_request = TeacherRequestHistory(user_id=new_user.id, status='Pending')
@@ -144,10 +149,9 @@ def sign_up():
                     flash('Registration successful', category='success')
                     login_user(new_user)
                     return redirect(url_for('views.home'))
-                    
 
     roles = Role.query.all()
-    return render_template('sign_up.html',user=current_user, roles=roles)
+    return render_template('sign_up.html', user=current_user, roles=roles)
 
 
 @auth.route('/logout')
@@ -309,10 +313,15 @@ def award_points():
             student = User.query.filter_by(id=student_id, role_id=3).first()
 
             if student:
-                student_account = Account.query.filter_by(id=student.id).first()
+                student_account = Account.query.filter_by(user_id=student.id).first()
                 if student_account:
                     student_account.balance += points
                     db.session.commit()
+
+                    teacher_account = Account.query.filter_by(user_id=current_user.id).first()
+                    teacher_account.points_awarded += points
+                    db.session.commit()
+
                     transaction = Transactions(
                         sequence=1,
                         from_account_id=current_user.id,
@@ -322,6 +331,7 @@ def award_points():
                     )
                     db.session.add(transaction)
                     db.session.commit()
+
                     flash('Transaction successful!', 'success')
                     return redirect(url_for('auth.award_points'))
                 else:
@@ -335,7 +345,6 @@ def award_points():
         return render_template('award_points.html', year_groups=year_groups, classes=classes, students=students, user=current_user, remaining_points=remaining_points, remaining_point_percentage=remaining_point_percentage)
     else:
         return "You are not authorized to access this page."
-
 
 
 @auth.route('/create_class', methods=['GET', 'POST'])

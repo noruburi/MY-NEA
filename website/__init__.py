@@ -34,17 +34,44 @@ def create_app():
         if not teacher_role:
             teacher_role = Role(name='teacher')
             db.session.add(teacher_role)
-        
+            db.session.commit()
+            
         student_role = Role.query.filter_by(name='student').first()
         if not student_role:
             student_role = Role(name='student')
             db.session.add(student_role)
+            db.session.commit()
 
         admin = User.query.filter_by(email='admin@Kimberley.com').first()
         if not admin:
             admin = User(email='admin@Kimberley.com', password=generate_password_hash('secret', method='sha256'), first_name='Admin', role_id=admin_role.id)
             db.session.add(admin)
             db.session.commit()
+
+        teacher = User.query.filter_by(email='teacher@Kimberley.com').first()
+        if not teacher:
+            teacher = User(email='teacher@Kimberley.com', password=generate_password_hash('secret', method='sha256'), first_name='Teacher', role_id=teacher_role.id)
+            db.session.add(teacher)
+            db.session.commit()
+        teacher_account = Account.query.filter_by(user_id=teacher.id).first()
+        if not teacher_account:
+            teacher_account = Account(user=teacher, balance=0)
+            db.session.add(teacher_account)
+            db.session.commit()
+
+        student = User.query.filter_by(email='student@Kimberley.com').first()
+        if not student:
+            student = User(email='student@Kimberley.com', password=generate_password_hash('secret', method='sha256'), first_name='Student', role_id=student_role.id)
+            db.session.add(student)
+            db.session.commit()
+        student_account = Account.query.filter_by(user_id=student.id).first()
+        if not student_account:
+            student_account = Account(user=student, balance=0)
+            db.session.add(student_account)
+            db.session.commit()
+
+        teacher.account = teacher_account
+        student.account = student_account
         db.session.commit()
     
         subjects_list = ['Math', 'English', 'Science', 'History', 'Geography', 'Art', 'Physical Education', 'Music']
@@ -55,7 +82,7 @@ def create_app():
                 db.session.add(new_subject)
                 db.session.commit()
 
-    from .models import User, Role, Subject    
+    from .models import User, Role, Subject, Account   
 
     from .auth import auth as auth_blueprint
     app.register_blueprint(auth_blueprint)
