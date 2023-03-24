@@ -51,7 +51,7 @@ class User(db.Model, UserMixin):
 class Account(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    user = db.relationship('User', foreign_keys=[user_id], backref=db.backref('account', lazy=True))
+    user = db.relationship('User', foreign_keys=[user_id], backref=db.backref('account', lazy=True), uselist=False)
     balance = db.Column(db.Integer)
 
 class Transactions(db.Model, UserMixin):

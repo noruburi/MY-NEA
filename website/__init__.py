@@ -70,8 +70,8 @@ def create_app():
             db.session.add(student_account)
             db.session.commit()
 
-        teacher.account = teacher_account
-        student.account = student_account
+        teacher.account_id = teacher_account.id
+        student.account_id = student_account.id
         db.session.commit()
     
         subjects_list = ['Math', 'English', 'Science', 'History', 'Geography', 'Art', 'Physical Education', 'Music']
