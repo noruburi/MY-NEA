@@ -50,7 +50,8 @@ def create_app():
 
         teacher = User.query.filter_by(email='teacher@Kimberley.com').first()
         if not teacher:
-            teacher = User(email='teacher@Kimberley.com', password=generate_password_hash('secret', method='sha256'), first_name='Teacher', role_id=teacher_role.id)
+            teacher = User(email='teacher@Kimberley.com', password=generate_password_hash('secret', method='sha256'), first_name='Teacher', last_name='LastName', role_id=teacher_role.id)
+            teacher.user_name = generate_username(teacher.first_name, teacher.last_name)
             db.session.add(teacher)
             db.session.commit()
         teacher_account = Account.query.filter_by(user_id=teacher.id).first()
@@ -61,7 +62,8 @@ def create_app():
 
         student = User.query.filter_by(email='student@Kimberley.com').first()
         if not student:
-            student = User(email='student@Kimberley.com', password=generate_password_hash('secret', method='sha256'), first_name='Student', role_id=student_role.id)
+            student = User(email='student@Kimberley.com', password=generate_password_hash('secret', method='sha256'), first_name='Student', last_name='LastName', role_id=student_role.id)
+            student.user_name = generate_username(student.first_name, student.last_name)
             db.session.add(student)
             db.session.commit()
         student_account = Account.query.filter_by(user_id=student.id).first()
@@ -70,6 +72,7 @@ def create_app():
             db.session.add(student_account)
             db.session.commit()
 
+        teacher.role_approved = True
         teacher.account_id = teacher_account.id
         student.account_id = student_account.id
         db.session.commit()
@@ -86,6 +89,8 @@ def create_app():
 
     from .auth import auth as auth_blueprint
     app.register_blueprint(auth_blueprint)
+
+    from .auth import generate_username
 
     from .views import views as views_blueprint
     app.register_blueprint(views_blueprint)
