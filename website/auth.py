@@ -347,6 +347,78 @@ def award_points():
         return "You are not authorized to access this page."
 
 
+
+# @auth.route('/award_points', methods=['GET', 'POST'])
+# @login_required
+# def award_points():
+#     if current_user.is_admin() or current_user.is_teacher():
+#         year_groups = db.session.query(Class.year_group).distinct().all()
+#         classes = Class.query.filter_by(teacher=current_user).all()
+#         students = User.query.filter_by(role_id=3).all()
+
+#         if request.method == 'POST':
+#             year_group = request.form['year_group']
+#             class_id = request.form['class_id']
+#             student_id = request.form['student_id']
+#             points = int(request.form['amount'])
+
+#             if current_user.remaining_points < points:
+#                 flash('You do not have enough points to award.', 'danger')
+#                 return redirect(url_for('auth.award_points'))
+
+#             if current_user.account.points_awarded_this_week >= current_user.weekly_point_limit:
+#                 flash('You have exceeded your weekly point limit.', 'danger')
+#                 return redirect(url_for('auth.award_points'))
+
+#             student = User.query.filter_by(id=student_id, role_id=3).first()
+
+#             if student:
+#                 student_account = Account.query.filter_by(user_id=student.id).first()
+#                 if student_account:
+#                     student_account.balance += points
+#                     db.session.commit()
+
+#                     # Add loop to update points_awarded_this_week and last_award_date
+#                     for user in [current_user, student]:
+#                         today = datetime.utcnow().date()
+#                         if user.last_award_date and user.last_award_date.isocalendar()[1] == today.isocalendar()[1]:
+#                             user.points_awarded_this_week += points
+#                         else:
+#                             user.points_awarded_this_week = points
+#                         user.last_award_date = today
+#                         db.session.commit()
+
+#                     teacher_account = Account.query.filter_by(user_id=current_user.id).first()
+#                     teacher_account.points_awarded += points
+#                     db.session.commit()
+
+#                     transaction = Transactions(
+#                         sequence=1,
+#                         from_account_id=current_user.id,
+#                         dateTime=datetime.utcnow(),
+#                         to_account_id=student.id,
+#                         amount=points
+#                     )
+#                     db.session.add(transaction)
+#                     db.session.commit()
+
+#                     flash('Transaction successful!', 'success')
+#                     return redirect(url_for('auth.award_points'))
+#                 else:
+#                     flash('Invalid student ID', 'danger')
+#             else:
+#                 flash('Invalid student name or class name', 'danger')
+
+
+#         remaining_points = current_user.remaining_points
+#         remaining_point_percentage = current_user.remaining_point_percentage
+
+#         return render_template('award_points.html', year_groups=year_groups, classes=classes, students=students, user=current_user, remaining_points=remaining_points, remaining_point_percentage=remaining_point_percentage)
+#     else:
+#         return "You are not authorized to access this page."
+
+
+
 @auth.route('/create_class', methods=['GET', 'POST'])
 @login_required
 def create_class():
