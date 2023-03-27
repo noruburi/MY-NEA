@@ -29,13 +29,13 @@ class User(db.Model, UserMixin):
     def remaining_points(self):
         today = datetime.utcnow().date()
         if self.last_award_date and self.last_award_date.isocalendar()[1] == today.isocalendar()[1]:
-            return max(self.weekly_point_limit - self.points_awarded, 0)
+            return max(self.weekly_point_limit - self.points_awarded_this_week, 0)
         else:
             return self.weekly_point_limit
 
     @property
     def points_awarded_percentage(self):
-        return int(self.points_awarded / self.weekly_point_limit * 100)
+        return int(self.points_awarded_this_week / self.weekly_point_limit * 100)
 
     @property
     def remaining_point_percentage(self):

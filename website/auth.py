@@ -320,6 +320,7 @@ def award_points():
 
                     teacher_account = Account.query.filter_by(user_id=current_user.id).first()
                     teacher_account.points_awarded += points
+                    current_user.points_awarded_this_week += points
                     db.session.commit()
 
                     transaction = Transactions(
