@@ -22,7 +22,6 @@ class User(db.Model, UserMixin):
     role_requested_on = db.Column(db.DateTime)
     account_id = db.Column(db.Integer, db.ForeignKey('account.id'))
     weekly_point_limit = db.Column(db.Integer, default=100)
-    points_awarded = db.Column(db.Integer, default=0)
     last_award_date = db.Column(db.Date)
     points_awarded_this_week = db.Column(db.Integer, default=0)
 
@@ -53,6 +52,7 @@ class Account(db.Model, UserMixin):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     user = db.relationship('User', foreign_keys=[user_id], backref=db.backref('account', lazy=True), uselist=False)
     balance = db.Column(db.Integer)
+    points_awarded = db.Column(db.Integer, default=0)
 
 class Transactions(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
