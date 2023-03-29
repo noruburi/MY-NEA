@@ -11,6 +11,7 @@
   {% elif user.is_authenticated and user.role.name == 'student' %}
   <a class="nav-item nav-link" id="login" href="{{ url_for('auth.student', student_id=current_user.id) }}">Join Class</a>
   <a class="nav-item nav-link" id="login" href="/student_rewards">Redeem Points</a>
+  <a class="nav-item nav-link" id="login" href="/dashboard">Student Dashboard</a>
   <a class="nav-item nav-link" id="logout" href="/logout">Logout</a>
 {% else %}
   <a class="nav-item nav-link" id="login" href="/landing">Home</a>
