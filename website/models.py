@@ -26,6 +26,7 @@ class User(db.Model, UserMixin):
     last_award_date = db.Column(db.Date)
     points_awarded_this_week = db.Column(db.Integer, default=0)
 
+
     @property
     def remaining_points(self):
         today = datetime.utcnow().date()
@@ -54,6 +55,7 @@ class Account(db.Model, UserMixin):
     user = db.relationship('User', foreign_keys=[user_id], backref=db.backref('account_ref', lazy=True), uselist=False)
     balance = db.Column(db.Integer)
     points_awarded = db.Column(db.Integer, default=0)
+    transactions = db.relationship('Transactions', backref='account', lazy=True)
 
 class Transactions(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
@@ -62,6 +64,7 @@ class Transactions(db.Model, UserMixin):
     dateTime = db.Column(db.DateTime)
     to_account_id = db.Column(db.Integer)
     amount = db.Column(db.Integer)
+    account_id = db.Column(db.Integer, db.ForeignKey('account.id'))
     
 class TeacherRequestHistory(db.Model):
     id = db.Column(db.Integer, primary_key=True)

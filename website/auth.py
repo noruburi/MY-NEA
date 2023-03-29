@@ -454,10 +454,10 @@ def student_rewards():
     student = User.query.filter_by(id=current_user.id, role_id=3).first()
     if student:
         available_items = [
-            {'name': 'Pen', 'points': 10},
-            {'name': 'Notebook', 'points': 20},
-            {'name': 'Coffee', 'points': 30},
-            {'name': 'Lunch', 'points': 50},
+            {'name': 'Pen', 'description': 'A high-quality pen', 'points': 10},
+            {'name': 'Notebook', 'description': 'A durable notebook', 'points': 20},
+            {'name': 'Coffee', 'description': 'A delicious cup of coffee', 'points': 30},
+            {'name': 'Lunch', 'description': 'A nutritious lunch', 'points': 50},
         ]
         if request.method == 'POST':
             item_index = int(request.form.get('item_index'))
@@ -488,8 +488,8 @@ def dashboard():
     user = current_user
     account = user.account
     balance = account.balance
-    transactions = account.transactions  # Assuming you have a transactions relationship in your Account model
-    return render_template('student_dashboard.html', balance=balance, transactions=transactions)
+    transactions = account.transactions
+    return render_template('student_dashboard.html', balance=balance, transactions=transactions, user=current_user)
 
 @auth.route('/redeem_coupon', methods=['POST'])
 @login_required
