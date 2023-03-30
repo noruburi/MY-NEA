@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, flash, redirect, url_for
+from flask import Blueprint, render_template, request, flash, redirect, url_for, jsonify
 from flask_login import login_user, current_user, logout_user, login_required
 from werkzeug.security import check_password_hash, generate_password_hash
 from .models import User, Role, Transactions, TeacherRequestHistory, Account, Class, Subject, JoinRequest, Coupon
@@ -469,7 +469,7 @@ def student_rewards():
                 db.session.commit()
 
                 coupon_code = None  # TODO: Generate unique 8-digit code
-                coupon = Coupon(student_id=student.id, name=item['name'], description=item['description'], points_cost=item['points'], code=coupon_code, redeemed=False, redeem_date=None)
+                coupon = Coupon(student_id=student.id, name=item['name'], description=item['description'], points_cost=item['points'], code=None, redeemed=False, redeem_date=None)
                 db.session.add(coupon)
                 db.session.commit()
                 flash('Coupon purchased successfully!', 'success')
@@ -494,10 +494,15 @@ def dashboard():
 @auth.route('/redeem_coupon', methods=['POST'])
 @login_required
 def redeem_coupon():
-    coupon_code = request.form.get('coupon_code')
-    # Add your logic to redeem the coupon code here
-    # Update the user's account balance and transaction history
-    flash('Coupon redeemed successfully!', 'success')
-    return redirect(url_for('auth.dashboard'))
+    coupon_id = request.form.get('coupon_id')
+    coupon = Coupon.query.filter_by(id=coupon_id).first()
+    if coupon and not coupon.redeemed:
+        coupon.code = coupon.generate_code()
+        coupon.redeem()
+        db.session.commit()
+        return jsonify({'code': coupon.code})
+    else:
+        return jsonify({'error': 'Invalid or already redeemed coupon code'}), 400
+
 
 #//student--------------------------------------------------------------------------------------------------------------------------------------------------------------------------

@@ -43,14 +43,66 @@
       <div class="col-md-12">
         <div class="card mb-4">
           <div class="card-body">
-            <h5 class="card-title">Redeem coupon code</h5>
-            <form action="{{ url_for('auth.redeem_coupon') }}" method="POST" class="redeem-form">
-              <input type="text" name="coupon_code" placeholder="Enter coupon code" required>
-              <button type="submit">Redeem</button>
-            </form>
+            <h2>My Coupons</h2>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Description</th>
+                  <th>Points</th>
+                  <th>Redeemed</th>
+                  <th>Redeem</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for coupon in user.coupons %}
+                <tr id="coupon-row-{{ coupon.id }}">
+                  <td>{{ coupon.name }}</td>
+                  <td>{{ coupon.description }}</td>
+                  <td>{{ coupon.points_cost }}</td>
+                  <td>{{ 'Yes' if coupon.redeemed else 'No' }}</td>
+                  <td>
+                    {% if not coupon.redeemed %}
+                      <form id="redeem-form-{{ coupon.id }}" method="post">
+                        <input type="hidden" name="coupon_id" value="{{ coupon.id }}">
+                        <button id="redeem-btn-{{ coupon.id }}" type="button" class="btn btn-primary" onclick="redeemCoupon({{ coupon.id }})">Redeem</button>
+                      </form>
+                    {% endif %}
+                  </td>
+                </tr>
+              {% endfor %}
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
     </div>
   </div>
+{% endblock %}
+{% block scripts %}
+  <script>
+function redeemCoupon(couponId) {
+  fetch("{{ url_for('auth.redeem_coupon') }}", {
+    method: "POST",
+    body: new FormData(document.querySelector(`#redeem-form-${couponId}`)),
+    headers: {
+      'X-CSRFToken': "{{ csrf_token() }}"
+    }
+  })
+        .then(response => {
+          if (response.ok) {
+            return response.json();
+          } else {
+            throw new Error("Failed to redeem the coupon");
+          }
+        })
+        .then(data => {
+          document.querySelector(`#coupon-row-${couponId}`).children[3].innerText = "Yes";
+          document.querySelector(`#redeem-btn-${couponId}`).replaceWith(document.createTextNode(data.code));
+        })
+        .catch(error => {
+          alert(error.message);
+        });
+    }
+  </script>
 {% endblock %}

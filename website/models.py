@@ -122,7 +122,7 @@ class Coupon(db.Model):
     name = db.Column(db.String(50), nullable=False)
     description = db.Column(db.String(200), nullable=False)
     points_cost = db.Column(db.Integer, nullable=False)
-    code = db.Column(db.String(8), nullable=False, unique=True)
+    code = db.Column(db.String(8), nullable=True, unique=True)
     redeemed = db.Column(db.Boolean, nullable=False, default=False)
     redeem_date = db.Column(db.DateTime)
 
