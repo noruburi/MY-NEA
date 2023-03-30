@@ -61,11 +61,12 @@
                   <td>{{ coupon.description }}</td>
                   <td>{{ coupon.points_cost }}</td>
                   <td>{{ 'Yes' if coupon.redeemed else 'No' }}</td>
+                  <td id="code-{{ coupon.id }}" class="code-cell" style="display: none;">{{ coupon.code }}</td>
                   <td>
                     {% if not coupon.redeemed %}
                       <form id="redeem-form-{{ coupon.id }}" method="post">
                         <input type="hidden" name="coupon_id" value="{{ coupon.id }}">
-                        <button id="redeem-btn-{{ coupon.id }}" type="button" class="btn btn-primary" onclick="redeemCoupon({{ coupon.id }})">Redeem</button>
+                        <button id="redeem-btn-{{ coupon.id }}" type="button" class="btn btn-primary">Redeem</button>
                       </form>
                     {% endif %}
                   </td>
@@ -82,27 +83,43 @@
 {% block scripts %}
   <script>
 function redeemCoupon(couponId) {
+  console.log("Redeeming coupon with ID:", couponId);
+
+  const form = document.querySelector(`#redeem-form-${couponId}`);
+  console.log("Form element:", form);
+
+  const formData = new FormData(form);
+  console.log("Form data:", formData);
+
+  const csrfToken = "{{ csrf_token() }}";
+  console.log("CSRF token:", csrfToken);
+
   fetch("{{ url_for('auth.redeem_coupon') }}", {
     method: "POST",
-    body: new FormData(document.querySelector(`#redeem-form-${couponId}`)),
+    body: formData,
     headers: {
-      'X-CSRFToken': "{{ csrf_token() }}"
+      'X-CSRFToken': csrfToken
     }
   })
-        .then(response => {
-          if (response.ok) {
-            return response.json();
-          } else {
-            throw new Error("Failed to redeem the coupon");
-          }
-        })
-        .then(data => {
-          document.querySelector(`#coupon-row-${couponId}`).children[3].innerText = "Yes";
-          document.querySelector(`#redeem-btn-${couponId}`).replaceWith(document.createTextNode(data.code));
-        })
-        .catch(error => {
-          alert(error.message);
-        });
-    }
+    .then(response => {
+      console.log("Fetch response:", response);
+      return response.json();
+    })
+    .then(data => {
+      console.log("Response data:", data);
+      // Rest of the redeemCoupon function code
+    })
+    .catch(error => {
+      console.error("Error:", error);
+      alert(error.message);
+    });
+}
+
+document.querySelectorAll('#redeem-btn').forEach(button => {
+  button.addEventListener('click', event => {
+    const couponId = event.target.id.split('-')[2];
+    redeemCoupon(couponId);
+  });
+});
   </script>
 {% endblock %}

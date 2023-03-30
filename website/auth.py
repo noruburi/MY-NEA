@@ -495,14 +495,19 @@ def dashboard():
 @login_required
 def redeem_coupon():
     coupon_id = request.form.get('coupon_id')
-    coupon = Coupon.query.filter_by(id=coupon_id).first()
+    print("Received redeem_coupon request for coupon ID:", coupon_id)
+
+    coupon = Coupon.query.get(coupon_id)
+    
     if coupon and not coupon.redeemed:
         coupon.code = coupon.generate_code()
         coupon.redeem()
         db.session.commit()
-        return jsonify({'code': coupon.code})
+        print("Coupon updated with code and redeem date:", coupon.code)
+        return jsonify({'code': coupon.code, 'status': 'success'})
     else:
-        return jsonify({'error': 'Invalid or already redeemed coupon code'}), 400
+        print("Failed to redeem coupon")
+        return jsonify({'status': 'failed'})
 
 
 #//student--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
