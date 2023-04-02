@@ -469,8 +469,11 @@ def student_rewards():
                 db.session.commit()
 
                 coupon_code = None  # TODO: Generate unique 8-digit code
-                coupon = Coupon(student_id=student.id, name=item['name'], description=item['description'], points_cost=item['points'], code=None, redeemed=False, redeem_date=None)
+                coupon = Coupon(student_id=student.id, name=item['name'], description=item['description'], points_cost=item['points'], code=coupon_code, redeemed=False, redeem_date=None)
                 db.session.add(coupon)
+                db.session.commit()
+                transaction = Transactions(sequence=1, from_account_id=student_account.id, dateTime=datetime.utcnow(), to_account_id=None, amount=-item['points'], account_id=student_account.id, code=coupon_code)
+                db.session.add(transaction)
                 db.session.commit()
                 flash('Coupon purchased successfully!', 'success')
             else:

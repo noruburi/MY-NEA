@@ -24,14 +24,16 @@
                   <th>Date</th>
                   <th>Description</th>
                   <th>Amount</th>
+                  <th>Coupon Code</th>
                 </tr>
               </thead>
               <tbody>
                 {% for transaction in transactions %}
                   <tr>
-                    <td>{{ transaction.date }}</td>
+                    <td>{{ transaction.dateTime }}</td>
                     <td>{{ transaction.description }}</td>
                     <td>{{ transaction.amount }}</td>
+                    <td>{{ transaction.code if transaction.code else '' }}</td>
                   </tr>
                 {% endfor %}
               </tbody>
@@ -39,7 +41,8 @@
           </div>
         </div>
       </div>
-      
+    
+
       <div class="col-md-12">
         <div class="card mb-4">
           <div class="card-body">
@@ -101,21 +104,23 @@ function redeemCoupon(couponId) {
       'X-CSRFToken': csrfToken
     }
   })
-    .then(response => {
-      console.log("Fetch response:", response);
-      return response.json();
-    })
-    .then(data => {
-      console.log("Response data:", data);
-      // Rest of the redeemCoupon function code
-    })
-    .catch(error => {
-      console.error("Error:", error);
-      alert(error.message);
-    });
-}
+  .then(data => {
+  console.log("Response data:", data);
+  if (data.success) {
+    document.querySelector(`#code-${couponId}`).style.display = 'table-cell';
+    document.querySelector(`#redeem-btn-${couponId}`).style.display = 'none';
+    document.querySelector(`#coupon-row-${couponId} td:nth-child(4)`).innerText = 'Yes';
+  } else {
+    alert(data.message);
+  }
+})
+.catch(error => {
+  console.error("Error:", error);
+  alert(error.message);
+});
 
-document.querySelectorAll('#redeem-btn').forEach(button => {
+
+document.querySelectorAll('.btn.btn-primary').forEach(button => {
   button.addEventListener('click', event => {
     const couponId = event.target.id.split('-')[2];
     redeemCoupon(couponId);

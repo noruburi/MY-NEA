@@ -64,6 +64,7 @@ class Transactions(db.Model, UserMixin):
     dateTime = db.Column(db.DateTime)
     to_account_id = db.Column(db.Integer)
     amount = db.Column(db.Integer)
+    code = db.Column(db.String(8), nullable=True)
     account_id = db.Column(db.Integer, db.ForeignKey('account.id'))
     
 class TeacherRequestHistory(db.Model):
