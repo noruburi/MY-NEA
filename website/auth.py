@@ -507,10 +507,11 @@ def redeem_coupon():
         coupon.redeem()
         db.session.commit()
         print("Coupon updated with code and redeem date:", coupon.code)
-        return jsonify({'code': coupon.code, 'status': 'success'})
+        return jsonify({'code': coupon.code, 'success': True})
     else:
         print("Failed to redeem coupon")
-        return jsonify({'status': 'failed'})
+        return jsonify({'message': 'Failed to redeem coupon', 'success': False})
+
 
 
 #//student--------------------------------------------------------------------------------------------------------------------------------------------------------------------------

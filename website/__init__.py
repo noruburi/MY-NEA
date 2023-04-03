@@ -1,18 +1,24 @@
-from flask import Flask
+from flask import Flask, session
 from flask_sqlalchemy import SQLAlchemy
 from os import path
 from flask_login import LoginManager, login_user
 from werkzeug.security import generate_password_hash
-
+import secrets
 
 db = SQLAlchemy()
 DB_NAME = "database.db"
+
+def generate_csrf_token():
+    if '_csrf_token' not in session:
+        session['_csrf_token'] = secrets.token_hex(32)
+    return session['_csrf_token']
 
 def create_app():
     app = Flask(__name__)
     app.config['SECRET_KEY'] = 'hjshjhdjah kjshkjdhjs'
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + DB_NAME  #store database inside the directory of the init.py file
     db.init_app(app)
+    app.jinja_env.globals['csrf_token'] = generate_csrf_token  # Make csrf_token function available in templates    
 
     login_manager = LoginManager()
     login_manager.login_view = 'auth.login'
