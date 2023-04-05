@@ -66,6 +66,8 @@ class Transactions(db.Model, UserMixin):
     amount = db.Column(db.Integer)
     code = db.Column(db.String(8), nullable=True)
     account_id = db.Column(db.Integer, db.ForeignKey('account.id'))
+    coupon_id = db.Column(db.Integer, db.ForeignKey('coupon.id'))
+    coupon = db.relationship('Coupon', backref=db.backref('transactions', lazy=True))
     
 class TeacherRequestHistory(db.Model):
     id = db.Column(db.Integer, primary_key=True)

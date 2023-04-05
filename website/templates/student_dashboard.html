@@ -23,18 +23,18 @@
                   <thead>
                     <tr>
                       <th>Date</th>
-                      <th>Item Name</th>
+                      <th>Coupon Name</th>
                       <th>Amount</th>
-                      <th>Coupon Code</th>
+                      <th>Date Redeemed</th>
                     </tr>
                   </thead>
                   <tbody>
                     {% for transaction in transactions %}
                       <tr>
                         <td>{{ transaction.dateTime }}</td>
-                        <td>{{ transaction.item_name }}</td>
+                        <td>{{ transaction.coupon.name }}</td>
                         <td>{{ transaction.amount }}</td>
-                        <td>{{ transaction.code if transaction.code else '' }}</td>
+                        <td>{{ transaction.coupon.redeem_date.strftime('%Y-%m-%d') if transaction.coupon.redeemed else '' }}</td>
                       </tr>
                     {% endfor %}
                   </tbody>
@@ -48,6 +48,7 @@
                       <th>Description</th>
                       <th>Points</th>
                       <th>Redeemed</th>
+                      <th>Code</th>
                       <th>Redeem</th>
                     </tr>
                   </thead>
@@ -58,6 +59,7 @@
                         <td>{{ coupon.description }}</td>
                         <td>{{ coupon.points_cost }}</td>
                         <td>{{ 'Yes' if coupon.redeemed else 'No' }}</td>
+                        <td id="code-{{ coupon.id }}" style="{{ 'display: table-cell;' if coupon.redeemed else 'display: none;' }}">{{ coupon.code if coupon.redeemed else '' }}</td>
                         <td>
                           {% if not coupon.redeemed %}
                             <form id="redeem-form-{{ coupon.id }}" method="post">
@@ -81,42 +83,44 @@
 {% endblock %}
 {% block scripts %}
   <script>
-    console.log("Script started");
-    function redeemCoupon(couponId) {
-      console.log("Redeeming coupon with ID:", couponId);
+function redeemCoupon(couponId) {
+  console.log("Redeeming coupon with ID:", couponId);
 
-      const form = document.querySelector(`#redeem-form-${couponId}`);
-      console.log("Form element:", form);
+  const form = document.querySelector(`#redeem-form-${couponId}`);
+  console.log("Form element:", form);
 
-      const formData = new FormData(form);
-      console.log("Form data:", formData);
+  const formData = new FormData(form);
+  console.log("Form data:", formData);
 
-      const csrfToken = "{{ csrf_token() }}";
-      console.log("CSRF token:", csrfToken);
+  const csrfToken = "{{ csrf_token() }}";
+  console.log("CSRF token:", csrfToken);
 
-      fetch("{{ url_for('auth.redeem_coupon') }}", {
-        method: "POST",
-        body: formData,
-        headers: {
-          'X-CSRFToken': csrfToken
-        }
-      })
-      .then(response => response.json())
-      .then(data => {
-        console.log("Response data:", data);
-        if (data.success) {
-          document.querySelector(`#code-${couponId}`).style.display = 'table-cell';
-          document.querySelector(`#redeem-btn-${couponId}`).style.display = 'none';
-          document.querySelector(`#coupon-row-${couponId} td:nth-child(4)`).innerText = 'Yes';
-        } else {
-          alert(data.message);
-        }
-      })
-      .catch(error => {
-        console.error("Error:", error);
-        alert(error.message);
-      });
+  fetch("{{ url_for('auth.redeem_coupon') }}", {
+    method: "POST",
+    body: formData,
+    headers: {
+      'X-CSRFToken': csrfToken
     }
+  })
+  .then(response => response.json())
+  .then(data => {
+    console.log("Response data:", data);
+    if (data.success) {
+      const codeCell = document.querySelector(`#code-${couponId}`);
+      codeCell.innerText = data.code;
+      codeCell.style.display = 'table-cell';
+
+      document.querySelector(`#redeem-btn-${couponId}`).style.display = 'none';
+      document.querySelector(`#coupon-row-${couponId} td:nth-child(4)`).innerText = 'Yes';
+    } else {
+      alert(data.message);
+    }
+  })
+  .catch(error => {
+    console.error("Error:", error);
+    alert(error.message);
+  });
+}
 
     window.addEventListener('load', () => {
       console.log("Window load event fired");
