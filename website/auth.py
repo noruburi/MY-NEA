@@ -494,6 +494,7 @@ def dashboard():
     transactions = account.transactions
     return render_template('student_dashboard.html', balance=balance, transactions=transactions, user=current_user)
 
+
 @auth.route('/redeem_coupon', methods=['POST'])
 @login_required
 def redeem_coupon():
