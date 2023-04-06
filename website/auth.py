@@ -506,6 +506,12 @@ def redeem_coupon():
     if coupon and not coupon.redeemed:
         coupon.code = coupon.generate_code()
         coupon.redeem()
+
+        # Update the transaction record with the redeem date
+        transaction = Transactions.query.filter_by(coupon_id=coupon_id).first()
+        if transaction:
+            transaction.date_redeemed = datetime.utcnow()
+
         db.session.commit()
         print("Coupon updated with code and redeem date:", coupon.code)
         return jsonify({'code': coupon.code, 'success': True})
