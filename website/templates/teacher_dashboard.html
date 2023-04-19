@@ -1,5 +1,7 @@
 {% extends "base.html" %}
+
 {% block content %}
+
 <!-- Existing content for the student -->
 <!-- Add the following section to display the classes -->
 <div class="container">
@@ -28,6 +30,7 @@
     </tbody>
   </table>
 </div>
+<!-- Add a form for the user to search for classes -->
 <div class="container">
   <form method="GET" action="{{ url_for('auth.student', student_id=student.id) }}">
     <div class="form-group">
