@@ -113,14 +113,14 @@ def create_app():
         student.account_id = student_account.id
         db.session.commit()
     
-    # Create the Subject records for the default list of subjects if they don't exist
-    subjects_list = ['Math', 'English', 'Science', 'History', 'Geography', 'Art', 'Physical Education', 'Music']
-    for subject_name in subjects_list:
-        subject = Subject.query.filter_by(name=subject_name).first()
-        if not subject:
-            new_subject = Subject(name=subject_name)
-            db.session.add(new_subject)
-            db.session.commit()
+        # Create the Subject records for the default list of subjects if they don't exist
+        subjects_list = ['Math', 'English', 'Science', 'History', 'Geography', 'Art', 'Physical Education', 'Music']
+        for subject_name in subjects_list:
+            subject = Subject.query.filter_by(name=subject_name).first()
+            if not subject:
+                new_subject = Subject(name=subject_name)
+                db.session.add(new_subject)
+                db.session.commit()
 
     # Import necessary models and blueprints inside of the function to avoid calling databases before they have been made 
     from .models import User, Role, Subject, Account   
