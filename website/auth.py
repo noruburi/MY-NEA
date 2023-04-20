@@ -250,7 +250,7 @@ def update_teacher_request():
     # Add the history entry to the database and commit the changes
     db.session.add(history_entry)
     db.session.commit()
-
+    
     # Redirect to the admin page
     return redirect(url_for('auth.admin_page'))
 
@@ -263,6 +263,7 @@ def view_teacher_requests():
     requests = TeacherRequestHistory.query.join(User, TeacherRequestHistory.user_id == User.id).order_by(User.role_requested_on).all()
     # Render the teacher requests history page and pass in the requests and the current user
     return render_template('teacher_requests_history.html', requests=requests, user=current_user)
+
 
 #//admin--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -277,7 +278,7 @@ def teacher():
     join_requests = JoinRequest.query.join(User).filter(User.id == 3).all()
     classes = Class.query.all()
     # Render the teacher.html template and pass the queried data to it as arguments
-    return render_template('teacher.html', user=current_user, join_requests=join_requests, classes=classes)
+    return render_template('teacher_dashboard.html', user=current_user, join_requests=join_requests, classes=classes)
 
 # Define a route for join request
 @auth.route('/join_request')
