@@ -5,7 +5,7 @@ from .models import User, Role, Transactions, TeacherRequestHistory, Account, Cl
 from . import db
 from sqlalchemy.exc import IntegrityError
 from datetime import datetime
-from sqlalchemy import and_
+from sqlalchemy import and_, func
 
 auth = Blueprint('auth', __name__) #defines auth blueprint to create url
 
@@ -199,6 +199,7 @@ def admin_page():
     return render_template('admin.html', user=current_user, transactions=transactions, teacher_requests=teacher_requests)
 
 
+
 # Route to update a teacher request
 @auth.route('/admin/update-teacher-request', methods=['POST'])
 @login_required
@@ -263,6 +264,51 @@ def view_teacher_requests():
     requests = TeacherRequestHistory.query.join(User, TeacherRequestHistory.user_id == User.id).order_by(User.role_requested_on).all()
     # Render the teacher requests history page and pass in the requests and the current user
     return render_template('teacher_requests_history.html', requests=requests, user=current_user)
+
+
+@auth.route('/admin_dashboard')
+def admin_dashboard():
+    # Get the filter values from the form submission
+    user_type = request.args.get('user-type', 'all')
+    min_amount = request.args.get('min-amount', type=int)
+    max_amount = request.args.get('max-amount', type=int)
+
+    # Query the database based on the filters
+    if user_type == 'teacher':
+        users = User.query.filter(User.role.has(name='teacher'))
+    elif user_type == 'student':
+        users = User.query.filter(User.role.has(name='student'))
+    else:
+        users = User.query
+
+    # Query transactions
+    transactions = db.session.query(Transactions)
+
+    if min_amount is not None:
+        transactions = transactions.filter(Transactions.amount >= min_amount)
+    if max_amount is not None:
+        transactions = transactions.filter(Transactions.amount <= max_amount)
+
+    # Get the total number of users
+    total_users = users.count()
+
+    # Get the total number of transactions and average transaction amount
+    total_transactions = transactions.count()
+    avg_transaction_amount = transactions.with_entities(func.avg(Transactions.amount)).scalar()
+
+    # Get the number of teachers and students
+    teachers_count = User.query.filter(User.role.has(name='teacher')).count()
+    students_count = User.query.filter(User.role.has(name='student')).count()
+
+    # Get the total number of points awarded by teachers
+    total_points_awarded = db.session.query(func.sum(Account.points_awarded)).join(User, Account.user_id == User.id).filter(User.role.has(name='teacher')).scalar()
+
+
+    # Get the total number of points received and spent by students
+    total_points_received = db.session.query(func.sum(Transactions.amount)).join(Account, Transactions.to_account_id == Account.id).filter(Account.role == 'student', Transactions.amount > 0).scalar()
+    total_points_spent = db.session.query(func.sum(Transactions.amount)).join(Account, Transactions.from_account_id == Account.id).filter(Account.role == 'student', Transactions.amount < 0).scalar()
+
+    return render_template('admin_dashboard.html', user=current_user, total_users=total_users, total_transactions=total_transactions, avg_transaction_amount=avg_transaction_amount, transactions=transactions, teachers_count=teachers_count, students_count=students_count, total_points_awarded=total_points_awarded, total_points_received=total_points_received, total_points_spent=total_points_spent)
 
 
 #//admin--------------------------------------------------------------------------------------------------------------------------------------------------------------------------

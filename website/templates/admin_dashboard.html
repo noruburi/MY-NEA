@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+
+<form method="get" action="{{ url_for('auth.admin_dashboard') }}">
+    <label for="user-type">User Type:</label>
+    <select name="user-type" id="user-type">
+      <option value="all"{% if user_type == 'all' %} selected{% endif %}>All Users</option>
+      <option value="teacher"{% if user_type == 'teacher' %} selected{% endif %}>Teachers</option>
+      <option value="student"{% if user_type == 'student' %} selected{% endif %}>Students</option>
+    </select>
+  
+    <label for="min-amount">Minimum Amount:</label>
+    <input type="number" name="min-amount" id="min-amount" {% if min_amount is not none %}value="{{ min_amount }}"{% endif %}>
+  
+    <label for="max-amount">Maximum Amount:</label>
+    <input type="number" name="max-amount" id="max-amount" {% if max_amount is not none %}value="{{ max_amount }}"{% endif %}>
+  
+    <input type="submit" value="Filter">
+</form>
+
+<table>
+  <thead>
+    <tr>
+      <th>Transaction ID</th>
+      <th>User</th>
+      <th>Type</th>
+      <th>Amount</th>
+      <th>Date/Time</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for transaction in transactions %}
+      <tr>
+        <td>{{ transaction.id }}</td>
+        <td>{{ transaction.user.name }}</td>
+        <td>{{ transaction.type }}</td>
+        <td>{{ transaction.amount }}</td>
+        <td>{{ transaction.date }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<canvas id="myChart" width="400" height="400"></canvas>
+<script>
+    var ctx = document.getElementById('myChart').getContext('2d');
+    var myChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: ['Teachers', 'Students'],
+            datasets: [{
+                label: 'Number of Users',
+                data: [{{ teachers_count }}, {{ students_count }}],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: false,
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
+        }
+    });
+</script>
+
+{% endblock %}
