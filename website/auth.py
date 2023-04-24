@@ -289,7 +289,7 @@ def user_overview():
     points_spent_by_students = db.session.query(func.sum(Transactions.amount)).join(Account).join(User).filter(User.role_id == 3).scalar()
     points_spent_by_students *= -1 # convert to positive value
 
-    # Get the data for the line chart
+    # Get the data for the bar chart
     bar_labels = ['Points Awarded', 'Points Spent']
     bar_data = [points_awarded_by_teachers, points_spent_by_students]
 
@@ -634,7 +634,7 @@ def student_rewards():
                 flash('You do not have enough points to purchase this item', 'error')
         
         # Render the template with the available items and the student's information
-        return render_template('student_rewards.html', available_items=available_items, student=student, user=current_user)
+        return render_template('student_rewards.html', available_items=available_items, student=student, user=current_user, balance=student_account.balance)
     
     # If the user is not a student, display an error message and redirect to the home page
     else:
