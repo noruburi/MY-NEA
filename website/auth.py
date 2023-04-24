@@ -11,6 +11,10 @@ auth = Blueprint('auth', __name__) #defines auth blueprint to create url
 
 #//login and sign-up-------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+# Route for user login
+@auth.route('/landing', methods=['GET', 'POST'])
+def landing():
+    return render_template('landing.html', user=current_user)
 
 # Route for user login
 @auth.route('/login', methods=['GET', 'POST'])
