@@ -266,8 +266,9 @@ def view_teacher_requests():
     return render_template('teacher_requests_history.html', requests=requests, user=current_user)
 
 
-@auth.route('/admin_dashboard')
-def admin_dashboard():
+@auth.route('/user_overview')
+@login_required
+def user_overview():
     # Total number of users
     total_users = User.query.count()
 
@@ -278,28 +279,21 @@ def admin_dashboard():
     students = User.query.filter_by(role_id=3).count()
 
     # Number of points awarded by teachers
-    points_awarded_by_teachers = db.session.query(db.func.sum(Account.points_awarded)).join(User).filter(User.role_id == 2).scalar()
+    points_awarded_by_teachers = db.session.query(func.sum(Account.points_awarded)).join(User).filter(User.role_id == 2).scalar()
 
     # Number of points spent by students
-    points_spent_by_students = db.session.query(db.func.sum(Transactions.amount)).join(Account).join(User).filter(User.role_id == 3).scalar()
+    points_spent_by_students = db.session.query(func.sum(Transactions.amount)).join(Account).join(User).filter(User.role_id == 3).scalar()
+    points_spent_by_students *= -1 # convert to positive value
 
-    # Get the total number of transactions and average transaction amount
-    total_transactions = Transactions.query.count()
-    avg_transaction_amount = db.session.query(db.func.avg(Transactions.amount)).scalar()
+    # Get the data for the line chart
+    bar_labels = ['Points Awarded', 'Points Spent']
+    bar_data = [points_awarded_by_teachers, points_spent_by_students]
 
-    # Get the total number of teachers and students
-    teachers_count = User.query.filter_by(role_id=2).count()
-    students_count = User.query.filter_by(role_id=3).count()
+    # Get the data for the pie chart
+    pie_labels = ['Teachers', 'Students']
+    pie_data = [teachers, students]
 
-    # Get the total number of points received by students
-    total_points_received = db.session.query(db.func.sum(Transactions.amount)).join(Account).join(User).filter(User.role_id == 3, Transactions.amount > 0).scalar()
-
-    # Get the total number of points spent by students
-    total_points_spent = db.session.query(db.func.sum(Transactions.amount)).join(Account).join(User).filter(User.role_id == 3, Transactions.amount < 0).scalar()
-
-    return render_template('admin_dashboard.html', user=current_user, total_users=total_users, total_transactions=total_transactions, avg_transaction_amount=avg_transaction_amount, teachers_count=teachers_count, students_count=students_count, points_awarded_by_teachers=points_awarded_by_teachers, points_spent_by_students=points_spent_by_students, total_points_received=total_points_received, total_points_spent=total_points_spent)
-
-
+    return render_template('user_overview.html', user=current_user, total_users=total_users, pie_labels=pie_labels, pie_data=pie_data, bar_labels=bar_labels, bar_data=bar_data)
 #//admin--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 

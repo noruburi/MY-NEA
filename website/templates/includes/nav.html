@@ -1,13 +1,12 @@
 <div class="navbar">
   {% if user.is_authenticated and user.role.name == 'admin' %}
   <a class="nav-item nav-link" id="login" href="/admin">Admin Panel</a>
-  <a class="nav-item nav-link" id="login" href="/admin_dashboard">User overview</a>
+  <a class="nav-item nav-link" id="login" href="/user_overview">User overview</a>
   <a class="nav-item nav-link" id="login" href="/teacher_requests_history">Request history</a>
   <a class="nav-item nav-link" id="logout" href="/logout">Logout</a>
 {% elif user.is_authenticated and user.role.name == 'teacher' %}
   <a class="nav-item nav-link" id="login" href="/award_points">Award Points</a>
   <a class="nav-item nav-link" id="login" href="/create_class">Class Creation</a>
-  <a class="nav-item nav-link" id="login" href="/teacher">Dashboard</a>
   <a class="nav-item nav-link" id="login" href="{{ url_for('auth.join_request') }}">Join Requests</a>
   <a class="nav-item nav-link" id="logout" href="/logout">Logout</a>
 
