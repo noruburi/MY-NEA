@@ -4,8 +4,14 @@
 
 {% block content %}
 <div class="container">
-  <h1>Student Rewards</h1>
-  <p>Use your points to purchase rewards below:</p>
+  <div class="reward-container">
+    <h1>Student Rewards</h1>
+    {% if student_account %}
+    <p class="card-text">Your current account balance is: {{ student_account.balance }} points.</p>
+    {% else %}
+    <p class="card-text">You do not have an account yet.</p>
+    {% endif %}
+  </div>
   <table class="table">
     <thead>
       <tr>
@@ -26,7 +32,7 @@
             <button type="submit" class="btn btn-primary">Purchase</button>
           </form>
           {% else %}
-          <button class="btn btn-secondary" disabled>Not enough points</button>
+          <button class="btn btn-secondary" disabled>Purchase</button>
           {% endif %}
         </td>
       </tr>

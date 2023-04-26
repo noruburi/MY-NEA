@@ -589,12 +589,10 @@ def request_join_class(student_id, class_id):
 
 # Define a route for displaying available items and allowing students to purchase items
 @auth.route('/student_rewards', methods=['GET', 'POST'])
-@login_required  # Only allow authenticated users to access this route
+@login_required
 def student_rewards():
-    # Retrieve the current user's information
     student = User.query.filter_by(id=current_user.id, role_id=3).first()
     
-    # If the user is a student, display the available items and process the purchase if the form is submitted
     if student:
         available_items = [
             {'name': 'Pen', 'description': 'A high-quality pen', 'points': 10},
@@ -603,43 +601,39 @@ def student_rewards():
             {'name': 'Lunch', 'description': 'A nutritious lunch', 'points': 50},
         ]
         
-        # Check if the form is submitted via POST request
+        # Get the student account if it exists
+        student_account = student.account
+        
         if request.method == 'POST':
             item_index = int(request.form.get('item_index'))
             item = available_items[item_index]
-            student_account = student.account  # Retrieve the student's account information
             
-            # Check if the student has enough points to purchase the item
             if student_account.balance >= item['points']:
-                # Deduct points from the student's account
                 student_account.balance -= item['points']
                 db.session.commit()
-
-                # Generate a unique coupon code and create a coupon object to add to the database
-                coupon_code = None  # TODO: Generate unique 8-digit code
+                
+                coupon_code = None
                 coupon = Coupon(student_id=student.id, name=item['name'], description=item['description'], points_cost=item['points'], code=coupon_code, redeemed=False, redeem_date=None)
                 db.session.add(coupon)
                 db.session.commit()
                 
-                # Create a transaction object to track the purchase in the database
                 transaction = Transactions(sequence=1, from_account_id=student_account.id, dateTime=datetime.utcnow(), to_account_id=None, amount=-item['points'], account_id=student_account.id, code=coupon_code)
                 db.session.add(transaction)
                 db.session.commit()
                 
-                # Display a success message to the user
                 flash('Coupon purchased successfully!', 'success')
-            
-            # If the student does not have enough points, display an error message
+                
             else:
                 flash('You do not have enough points to purchase this item', 'error')
         
-        # Render the template with the available items and the student's information
-        return render_template('student_rewards.html', available_items=available_items, student=student, user=current_user, balance=student_account.balance)
-    
-    # If the user is not a student, display an error message and redirect to the home page
+        # Render the template with the updated student_account variable
+        return render_template('student_rewards.html', available_items=available_items, student=student, user=current_user, student_account=student_account)
+        
     else:
         flash('You are not a student!', category='error')
         return redirect(url_for('views.home'))
+
+
 
 # Define a route for displaying the student dashboard
 @auth.route('/dashboard')

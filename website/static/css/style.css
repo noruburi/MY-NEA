@@ -104,6 +104,14 @@ th {
 th {
   color: #000000;
 }
+
+.reward-container {
+  border: 1px solid #ccc;
+  box-shadow: 0px 0px 5px #ccc;
+  padding: 1px;
+  margin-bottom: 20px;
+}
+
 /*
 3. Footer
 ********************************************************************/
