@@ -6,6 +6,11 @@ from . import db
 from sqlalchemy.exc import IntegrityError
 from datetime import datetime
 from sqlalchemy import and_, func
+import json
+
+
+
+
 
 auth = Blueprint('auth', __name__) #defines auth blueprint to create url
 
@@ -448,7 +453,7 @@ def award_points():
         remaining_point_percentage = current_user.remaining_point_percentage
 
         # Render the 'award_points.html' template with the year groups, classes, students, user, remaining_points, and remaining_point_percentage variables
-        return render_template('award_points.html', year_groups=year_groups, classes=classes, students=students, user=current_user, remaining_points=remaining_points, remaining_point_percentage=remaining_point_percentage)
+        return render_template('award_points.html', year_groups=year_groups, classes=classes, students=json.dumps(students), user=current_user, remaining_points=remaining_points, remaining_point_percentage=remaining_point_percentage)
     else:
         return "You are not authorized to access this page."
 
