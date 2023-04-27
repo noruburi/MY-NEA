@@ -63,7 +63,7 @@
               <label for="student_id">Student:</label>
               <select class="form-control" id="student_id" name="student_id" required>
                 <option value="">Select a student</option>
-                {% for student in students %}
+                {% for student in class %}
                   <option value="{{ student.id }}">{{ student.first_name }} {{ student.last_name }}</option>
                 {% endfor %}
               </select>

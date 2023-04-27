@@ -73,13 +73,13 @@ def password_strength(password):
     else:
         missing_requirements = []
         if len(password) < 8:
-            missing_requirements.append("Password must be at least 8 characters.")
+            missing_requirements.append("Password must be at least 8 characters")
         if not any(char.isdigit() for char in password):
-            missing_requirements.append("Password must contain at least one digit.")
+            missing_requirements.append("Password must contain at least one digit")
         if not any(char.isupper() for char in password):
-            missing_requirements.append("Password must contain at least one uppercase letter.")
+            missing_requirements.append("Password must contain at least one uppercase letter")
         if not any(char in set(r"!@#$%^&*()/") for char in password):
-            missing_requirements.append("Password must contain at least one symbol (!@#$%^&*()/).")
+            missing_requirements.append("Password must contain at least one symbol (!@#$%^&*()/)")
         return score, ", ".join(missing_requirements)
 
 # Function to generate a unique username
@@ -119,8 +119,6 @@ def sign_up():
         # Check if passwords match and their length requirements
         elif password1 != password2:
             flash('Passwords don\'t match.', category='error')
-        elif len(password1) < 7:
-            flash('Password must be at least 7 characters.', category='error')  
         elif len(password1) > 25:
             flash('Password can only be 25 or less characters.', category='error')             
         else:
@@ -287,7 +285,11 @@ def user_overview():
 
     # Number of points spent by students
     points_spent_by_students = db.session.query(func.sum(Transactions.amount)).join(Account).join(User).filter(User.role_id == 3).scalar()
-    points_spent_by_students *= -1 # convert to positive value
+
+    if points_spent_by_students is not None:
+        points_spent_by_students *= -1 # convert to positive value
+    else:
+        points_spent_by_students = 0 # set to 0 if query returns None
 
     # Get the data for the bar chart
     bar_labels = ['Points Awarded', 'Points Spent']
