@@ -46,6 +46,12 @@ class User(db.Model, UserMixin):
     
     def is_teacher(self):
         return self.role.name == 'teacher'
+    
+    def class_name(self):
+        if self.enrolled_classes:
+            return self.enrolled_classes[0].class_name
+        else:
+            return None
 
 class Account(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
@@ -98,13 +104,14 @@ class Class(db.Model):
     year_group = db.Column(db.Integer)
     teacher_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     teacher = db.relationship('User', backref=db.backref('classes', lazy=True))
-    students = db.relationship('User', secondary=student_class, lazy='subquery',backref=db.backref('enrolled_classes', lazy=True))
+    # students = db.relationship('User', secondary=student_class, lazy='subquery',backref=db.backref('enrolled_classes', lazy=True))
+    students = db.relationship('User', secondary='student_class', lazy='subquery',backref=db.backref('enrolled_classes', lazy=True))
+
     
     def class_name(self):
         subject_initial = self.subject.name[0].upper() if self.subject.name else ''
-        teacher_first_name_initial = self.teacher.first_name[0].upper() if self.teacher.first_name else ''
-        teacher_last_name_initial = self.teacher.last_name[0].upper() if self.teacher.last_name else ''
-        return f"{self.year_group}{subject_initial}{teacher_first_name_initial}{teacher_last_name_initial}"
+        teacher_initials = ''.join([name[0].upper() for name in filter(None, [self.teacher.first_name, self.teacher.last_name])])
+        return f"{self.year_group}{subject_initial}{teacher_initials}"
     
 
 

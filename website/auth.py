@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for, jsonify
 from flask_login import login_user, current_user, logout_user, login_required
 from werkzeug.security import check_password_hash, generate_password_hash
-from .models import User, Role, Transactions, TeacherRequestHistory, Account, Class, Subject, JoinRequest, Coupon
+from .models import User, Role, Transactions, TeacherRequestHistory, Account, Class, Subject, JoinRequest, Coupon, student_class
 from . import db
 from sqlalchemy.exc import IntegrityError
 from datetime import datetime
@@ -347,15 +347,30 @@ def respond_join_request(join_request_id, action):
     # Get the join request object
     join_request = JoinRequest.query.get_or_404(join_request_id)
 
-    # Check if the current user is the teacher of the class
-    if current_user.id != join_request.class_.teacher_id:
-        flash('You are not authorized to respond to this join request!', category='error')
-        return redirect(url_for('auth.join_request'))
+    # # Check if the current user is the teacher of the class
+    # if current_user.id != join_request.class_.teacher_id:
+    #     flash('You are not authorized to respond to this join request!', category='error')
+    #     return redirect(url_for('auth.join_request'))
 
     # Update the status of the join request
     if action == 'accept':
         join_request.status = 'accepted'
         flash('Join request accepted!', category='success')
+
+        # Get the student and the class associated with the join request
+        student_id = join_request.student_id
+        class_ = join_request.class_
+
+        # Get the user object associated with the student_id
+        student = User.query.get(student_id)
+
+        # Add the student to the class
+        if student not in class_.students:
+            class_.students.append(student)
+
+        # Commit the changes to the database
+        db.session.commit()
+
     elif action == 'reject':
         join_request.status = 'rejected'
         flash('Join request rejected!', category='success')
@@ -368,6 +383,7 @@ def respond_join_request(join_request_id, action):
 
     # Redirect to the teacher dashboard
     return redirect(url_for('auth.join_request'))
+
 
 
 # Define the 'award_points' function to allow an admin or teacher to award points to a student account
@@ -383,9 +399,14 @@ def award_points():
         
         # Query the database for the classes that the current user is teaching
         classes = Class.query.filter_by(teacher=current_user).all()
-        
+
         # Query the database for all students
-        students = User.query.filter_by(role_id=3).all()
+        students = []
+        for student in User.query.filter_by(role_id=3).all():
+            class_name = student.class_name()
+            if class_name:
+                students.append({'id': student.id, 'username': student.user_name, 'year_group': class_name})
+
 
         # Check if the user has submitted a form
         if request.method == 'POST':
@@ -406,8 +427,12 @@ def award_points():
                 flash('You have exceeded your weekly point limit.', 'danger')
                 return redirect(url_for('auth.award_points'))
 
-            # Retrieve the student from the database
-            student = User.query.filter_by(id=student_id, role_id=3).first()
+            # Filter the list of students based on the selected class ID
+            students = []
+            for student in User.query.filter_by(role_id=3).join(Class.students).filter_by(id=class_id).all():
+                students.append({'id': student.id, 'username': student.user_name, 'year_group': student.class_name().year_group})
+
+
 
             # Check if the student exists
             if student:
@@ -453,7 +478,7 @@ def award_points():
         remaining_point_percentage = current_user.remaining_point_percentage
 
         # Render the 'award_points.html' template with the year groups, classes, students, user, remaining_points, and remaining_point_percentage variables
-        return render_template('award_points.html', year_groups=year_groups, classes=classes, students=json.dumps(students), user=current_user, remaining_points=remaining_points, remaining_point_percentage=remaining_point_percentage)
+        return render_template('award_points.html', year_groups=year_groups, classes=classes, students=students, user=current_user, remaining_points=remaining_points, remaining_point_percentage=remaining_point_percentage)
     else:
         return "You are not authorized to access this page."
 

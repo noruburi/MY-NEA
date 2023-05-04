@@ -61,9 +61,9 @@
             </div>
             <div class="form-group">
               <label for="student_id">Student:</label>
-              <select class="form-control" id="class_id" name="class_id" required onchange="updateStudentDropdown()">
+              <select class="form-control" id="student_id" name="student_id" required>
                 <option value="">Select a student</option>
-                {% for student in class %}
+                {% for student in students %}
                   <option value="{{ student.id }}">{{ student.first_name }} {{ student.last_name }}</option>
                 {% endfor %}
               </select>
@@ -79,31 +79,45 @@
 {% endblock %}
 
 <script>
-  function updateStudentDropdown() {
-    // Get the selected class ID
-    var classId = document.getElementById("class_id").value;
+students.forEach(function(student) {
+  if (student.year_group === year_group) {  // Only add students from the selected year group
+    var option = document.createElement("option");
+    option.value = student.id;
+    option.text = student.first_name + ' ' + student.last_name + ' (' + student.year_group + ')';
+    studentDropdown.add(option);
+  }
+});
+
+
+function getStudentsForClass(classId) {
+  return fetch('/students/' + classId)
+    .then(response => response.json())
+    .then(data => data.students);
+}
     
-    // Filter the 'students' array to only include students in the selected class
-    var filteredStudents = students.filter(function(student) {
-      return student.class_id == classId;
-    });
-    
+function updateStudentDropdown() {
+  // Get the selected class ID
+  var classId = document.getElementById("class_id").value;
+
+  // Fetch the list of students for the selected class
+  getStudentsForClass(classId).then(function(students) {
     // Clear the existing 'student_id' dropdown options
     var studentDropdown = document.getElementById("student_id");
     studentDropdown.innerHTML = '';
-    
+
     // Add the filtered list of students to the 'student_id' dropdown
     var defaultOption = document.createElement("option");
     defaultOption.value = '';
     defaultOption.text = 'Select a student';
     studentDropdown.add(defaultOption);
-    
-    filteredStudents.forEach(function(student) {
+
+    students.forEach(function(student) {
       var option = document.createElement("option");
       option.value = student.id;
       option.text = student.first_name + ' ' + student.last_name;
       studentDropdown.add(option);
     });
-  }
+  });
+}
   </script>
   
