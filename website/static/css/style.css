@@ -25,6 +25,24 @@ body {
   display: grid;
 }
 
+header {
+  position: fixed;
+  right: 0;
+  top: 0;
+  z-index: 1000;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 33px 9%;
+  background: transparent;
+}
+
+.logo img {
+  width: 50px; /* Adjust the width as needed */
+  height: auto; /* Maintain aspect ratio */
+}
+
 a:hover {
   color: #fece1a;
   text-decoration: none;
@@ -51,19 +69,23 @@ p {
 }
 
 .navbar {
-  background-color: #333;
   position: fixed;
   top: 0;
-  width: 100%;
+  right: 0;
   z-index: 1;
 }
 
+.logo {
+  width: 100px; /* Adjust the width of the logo as needed */
+  height: auto; /* Maintain aspect ratio */
+  margin-left: 10px; /* Add left margin to create space between logo and links */
+}
+
 .navbar a {
-  float: left;
-  display: block;
+  float: left; /* Use float instead of display: flex; */
   color: #f2f2f2;
   text-align: center;
-  padding: 14px 16px;
+  padding: 16px 4px;
   text-decoration: none;
 }
 
@@ -171,5 +193,5 @@ th {
   height: 400px;
 }
 
-/* Dashboard 
+/* Images
 **********************************************************/
