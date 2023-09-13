@@ -94,3 +94,15 @@ header {
   margin-left: 5px;
   transition: 0.5s ease;
 }
+#menu-icon {
+  font-size: 32px;
+  color: var(--bg-color);
+  z-index: 10001;
+  cursor: pointer;
+  display: none;
+}
+
+.nav-icons i:hover {
+  color: var(--text-color);
+  transform: scale(1.1);
+}
