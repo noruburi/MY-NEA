@@ -42,4 +42,14 @@ header {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  background: transparent;
+  padding: 30px 14%;
+  transition: all 0.5s ease;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  color: var(--text-color);
+  font-size: 33px;
 }
