@@ -1,28 +1,14 @@
 <header>
     <a href="#" class="logo"><i class='bx bxs-home'></i> Honey</a>
     <ul class="nav-list">
-      {% if user.is_authenticated %}
-        {% if user.role.name == 'admin' %}
-          <li class="nav-item"><a class="nav-link" href="/admin">Admin Panel</a></li>
-          <li class="nav-item"><a class="nav-link" href="/user_overview">User overview</a></li>
-          <li class="nav-item"><a class="nav-link" href="/teacher_requests_history">Request history</a></li>
-        {% elif user.role.name == 'teacher' %}
-          <li class="nav-item"><a class="nav-link" href="/award_points">Award Points</a></li>
-          <li class="nav-item"><a class="nav-link" href="/create_class">Class Creation</a></li>
-          <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.join_request') }}">Join Requests</a></li>
-        {% elif user.role.name == 'student' %}
-          <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.student', student_id=current_user.id) }}">Join Class</a></li>
-          <li class="nav-item"><a class="nav-link" href="/student_rewards">Redeem Points</a></li>
-          <li class="nav-item"><a class="nav-link" href="/dashboard">Student Dashboard</a></li>
-        {% endif %}
-        <li class="nav-item"><a class="nav-link" href="/logout">Logout</a></li>
-      {% else %}
-        <li class="nav-item"><a class="nav-link" href="/landing">Home</a></li>
-        <li class="nav-item"><a class="nav-link" href="/login">Login</a></li>
-        <li class="nav-item"><a class="nav-link" href="/sign_up">Sign up</a></li>
-        <li class="nav-item"><a href="#contact">Contact Us</a></li>
-      {% endif %}
-    </ul>
+      <ul>
+        <li><a href="#home" class="active">Home</a></li>
+        <li><a href="#about">About Us</a></li>
+        <li><a href="#shop">Our Shop</a></li>
+        <li><a href="#review">Our Customer</a></li>
+        <li><a href="#contact">Contact Us</a></li>
+      </ul>
+      
     <div class="nav-icons">
       <a href="#"><i class="bx bx-search"></i></a>
       <a href="#"><i class="bx bx-cart"></i></a>

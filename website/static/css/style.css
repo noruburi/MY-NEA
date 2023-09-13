@@ -6,7 +6,7 @@
 1. General
 **********************************************************************/
 /* Replace "selector" with a valid CSS selector */
-selector {
+* {
   padding: 0;
   margin: 0;
   box-sizing: border-box;
@@ -52,4 +52,5 @@ header {
   align-items: center;
   color: var(--text-color);
   font-size: 33px;
+  font-weight: 700;
 }
