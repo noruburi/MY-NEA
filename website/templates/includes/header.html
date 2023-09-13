@@ -1,6 +1,6 @@
 <header>
     <a href="#" class="logo"><i class='bx bxs-home'></i> ClassMaster</a>
-    <ul class="navlist">
+    <ul class="nav-list">
       {% if user.is_authenticated %}
       {% if user.role.name == 'admin' %}
         <li class="nav-item"><a class="nav-link" href="/admin">Admin Panel</a></li>
@@ -31,5 +31,6 @@
     </div>
   </header>
   
-  
+
+
   

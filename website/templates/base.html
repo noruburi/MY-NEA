@@ -1,9 +1,7 @@
 <!-- This is an HTML file for the Kimberly Banking website. -->
 <!DOCTYPE html>
 <html>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">  
+<head> 
 <!-- Set the title of the page, with a dynamic block for the title. -->
 <title>ClassMaster - {% block title %}{% endblock %}</title>
 
@@ -41,6 +39,15 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"></script>
 </head>
 <body>
+
+<!-- Set up a container with centered content. -->
+<div class="container my-5">
+    <div class="d-flex justify-content-center h-100">
+        <!-- Define a block for content that can be filled in by child templates. -->
+        {% block content %}{% endblock %}
+    </div>
+</div>
+
 
 {% include "includes/header.html" %}
 
