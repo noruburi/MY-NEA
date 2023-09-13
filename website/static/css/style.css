@@ -54,3 +54,21 @@ header {
   font-size: 33px;
   font-weight: 700;
 }
+
+.logo i {
+  vertical-align: middle;
+  margin-right: 8px;
+  color: var(--main-color);
+}
+
+.navlist {
+  display: flex;
+}
+
+.navlist a {
+  color: var(--text-color);
+  font-size: var(--p-font);
+  font-weight: 600;
+  margin: 0 30px;
+  transition: all 0.5s ease;
+}
