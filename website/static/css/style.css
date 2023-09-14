@@ -187,3 +187,20 @@ header.sticky {
   background: var(--other-color);
   border-radius: 3rem;
 }
+.container-box img {
+  width: 100%;
+  max-width: 50px;
+  height: auto;
+}
+.container-box h3 {
+  font-size: 21px;
+  font-weight: bold;
+  margin: 16px 0;
+}
+.container-box a {
+  color: var(--main-color);
+  font-size: var(--p-font);
+  font-weight: 600;
+  letter-spacing: 1px;
+  transition: all 0.5s ease;
+}
