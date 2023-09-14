@@ -22,7 +22,9 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.bundle.min.js"></script>
 
 <!-- Link to script in js folder -->
-<script src="{{ url_for('my_blueprint.static', filename='js/script.js') }}"></script>
+{% block javascript %}
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+{% endblock %}
 
 
 

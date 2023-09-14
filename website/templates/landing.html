@@ -11,7 +11,7 @@
     </div>
 
     <div class="home-img">
-        <img src="img/hero.png">
+        <img src="{{ url_for('static', filename='img/hero.png') }}" alt="Hero Image">
     </div>
 
 </section>
@@ -19,22 +19,23 @@
 <!-- container -->
 <section class="container">
     <div class="container-box">
-        <img src="website\static\img\c1.png">
-        <h3>Service Availible 24/7</h3>  
-        <a href="#">Learn More</a> 
+        <img src="{{ url_for('static', filename='img/c1.png') }}" alt="Service Available 24/7 Image">
+        <h3>Service Available 24/7</h3>
+        <a href="#">Learn More</a>
     </div>
-
+    
     <div class="container-box">
-        <img src="website\img\c2.png">
-        <h3>Kimberly college</h3>
-        <a href="#">Get Directions</a>  
+        <img src="{{ url_for('static', filename='img/c2.png') }}" alt="Kimberly College Image">
+        <h3>Kimberly College</h3>
+        <a href="#">Get Directions</a>
     </div>
-
+    
     <div class="container-box">
-        <img src="website\img\c3.png">
+        <img src="{{ url_for('static', filename='img/c3.png') }}" alt="0217 47231 Image">
         <h3>0217 47231</h3>
-        <a href="#">Call Us Now</a>  
+        <a href="#">Call Us Now</a>
     </div>
+    
 </section>
 
 {% endblock %}

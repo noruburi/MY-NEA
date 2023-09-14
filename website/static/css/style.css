@@ -172,3 +172,18 @@ span {
   transform: scale(1.1) translate(12px);
   box-shadow: #ff9f0d 0px 1px 25px;
 }
+header.sticky {
+  padding: 12px 14%;
+  background: var(--other-color);
+}
+.container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, auto));
+  gap: 2rem;
+  text-align: center;
+}
+.container-box {
+  padding: 43px 43px 43px 43px;
+  background: var(--other-color);
+  border-radius: 3rem;
+}
