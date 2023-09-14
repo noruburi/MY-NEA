@@ -169,5 +169,6 @@ span {
   transition: all 0.5s ease;
 }
 .btn2:hover {
-  transform: scale(1.1);
+  transform: scale(1.1) translate(12px);
+  box-shadow: #ff9f0d 0px 1px 25px;
 }
