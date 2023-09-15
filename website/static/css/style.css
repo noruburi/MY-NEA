@@ -237,7 +237,6 @@ header.sticky {
 
 /*------------------------------------------Login Page------------------------------------------*/
 
-/* This CSS should be in your external CSS file or style section */
 .login {
   display: flex;
   justify-content: center;
@@ -245,15 +244,20 @@ header.sticky {
   min-height: 100vh;
   width: 100%;
   background: none; /* Clear any background set by body */
-  /* Add other styles for the .login section as needed */
+  position: relative; /* Add this line */
 }
 
-.login-background {
-  /* Add styles for the container that holds the background image */
+.login .background-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw; /* Adjusted to 100vw */
+  height: 100vh; /* Adjusted to 100vh */
+  z-index: -1;
 }
 
 .login-background img {
-  /* Ensure the image takes up the entire container */
+  /* Ensure the image takes up the entire container while maintaining aspect ratio */
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -355,4 +359,73 @@ button {
 }
 .register p a:hover {
   text-decoration: underline;
+}
+
+/*------------------------------------------Sign_up Page------------------------------------------*/
+
+.sign-up-form {
+  background: transparent;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  border-radius: 20px;
+  backdrop-filter: blur(15px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 30px;
+  width: 400px;
+}
+
+.sign-up-form h2 {
+  font-size: 2em;
+  color: #fff;
+  text-align: center;
+}
+
+.sign-up-form .inputbox {
+  position: relative;
+  margin: 15px 0;
+}
+
+.sign-up-form .inputbox input {
+  width: 100%;
+  height: 40px;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 1em;
+  padding: 0 35px 0 5px;
+  color: #fff;
+}
+
+.sign-up-form .inputbox ion-icon {
+  position: absolute;
+  right: 8px;
+  color: #fff;
+  font-size: 1.2em;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.sign-up-form select {
+  width: 100%;
+  height: 40px;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 1em;
+  padding: 0 35px 0 5px;
+  color: #fff;
+}
+
+.sign-up-form button {
+  width: 100%;
+  height: 40px;
+  border-radius: 40px;
+  background: #fff;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  font-size: 1em;
+  font-weight: 600;
+  margin-top: 15px;
 }

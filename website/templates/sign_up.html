@@ -1,72 +1,44 @@
 {% extends "base.html" %}
 {% block title %}Sign Up{% endblock %}
 {% block content %}
-    <form method="POST" class="sign-up-form">
-      <h3 align="center">Sign Up</h3>
-      <!-- Add first_name and last_name input fields -->
-      <div class="form-group">
-        <label for="first_name">First Name</label>
-        <input
-          type="text"
-          class="form-control"
-          id="first_name"
-          name="first_name"
-          placeholder="Enter first name"
-        />
-      </div>
-      <div class="form-group">
-        <label for="last_name">Last Name</label>
-        <input
-          type="text"
-          class="form-control"
-          id="last_name"
-          name="last_name"
-          placeholder="Enter last name"
-        />
-      </div>
-      <!-- End of first_name and last_name input fields -->
-      <div class="form-group">
-        <label for="email">Email Address</label>
-        <input
-          type="email"
-          class="form-control"
-          id="email"
-          name="email"
-          placeholder="Enter email"
-        />
-      </div>
-      <!-- Remove the user_name input field -->
-      <div class="form-group">
-        <label for="password1">Password</label>
-        <input
-          type="password"
-          class="form-control"
-          id="password1"
-          name="password1"
-          placeholder="Enter password"
-        />
-      </div>
-      <div class="form-group">
-        <label for="password2">Password (Confirm)</label>
-        <input
-          type="password"
-          class="form-control"
-          id="password2"
-          name="password2"
-          placeholder="Confirm password"
-        />
-      </div>
-      <div class="form-group">
-        <label for="role">Select Role</label>
-        <select class="form-control" id="role" name="role">
-            <option value="student">Student</option>
-            <option value="teacher">Teacher</option>
-        </select>
+<section class="login" id="login">
+    <div class="form-box">
+        <div class="form-value">
+            <form method="POST" class="sign-up-form">
+                <h2>Sign Up</h2>
+                <div class="inputbox">
+                    <ion-icon name="person-outline"></ion-icon>
+                    <input type="text" required id="first_name" name="first_name" placeholder="First Name" />
+                </div>
+                <div class="inputbox">
+                    <ion-icon name="person-outline"></ion-icon>
+                    <input type="text" required id="last_name" name="last_name" placeholder="Last Name" />
+                </div>
+                <div class="inputbox">
+                    <ion-icon name="mail-outline"></ion-icon>
+                    <input type="email" required id="email" name="email" placeholder="Email" />
+                </div>
+                <div class="inputbox">
+                    <ion-icon name="lock-closed-outline"></ion-icon>
+                    <input type="password" required id="password1" name="password1" placeholder="Password" />
+                </div>
+                <div class="inputbox">
+                    <ion-icon name="lock-closed-outline"></ion-icon>
+                    <input type="password" required id="password2" name="password2" placeholder="Confirm Password" />
+                </div>
+                <div class="inputbox">
+                    <ion-icon name="person-circle-outline"></ion-icon>
+                    <select class="form-control" id="role" name="role">
+                        <option value="student">Student</option>
+                        <option value="teacher">Teacher</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
     </div>
-    <button type="submit" class="btn btn-primary">Submit</button>
-  </div>
+    <div class="background-img">
+        <img src="{{ url_for('static', filename='img/orange and black.jpg') }}" alt="OaB">
+    </div>
+</section>
 {% endblock %}
-
-
-
-
