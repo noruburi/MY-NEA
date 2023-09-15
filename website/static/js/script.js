@@ -1,13 +1,13 @@
-window.onload = function () {
-  document.addEventListener("DOMContentLoaded", function () {
-    const header = document.querySelector(".header");
-    if (header) {
-      window.addEventListener("scroll", function () {
-        header.classList.toggle("sticky", window.scrollY > 80);
-      });
-    }
-  });
+document.addEventListener("DOMContentLoaded", function () {
+  const header = document.querySelector(".header");
+  if (header) {
+    window.addEventListener("scroll", function () {
+      header.classList.toggle("sticky", window.scrollY > 80);
+    });
+  }
+});
 
+window.onload = function () {
   const sr = ScrollReveal({
     origin: "top",
     distance: "85px",
