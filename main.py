@@ -10,3 +10,4 @@ if __name__ == '__main__':
     # recreate_database(app)
     app.run(debug=True, host=('0.0.0.0'))
     
+    

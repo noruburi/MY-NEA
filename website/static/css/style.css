@@ -362,7 +362,6 @@ button {
 }
 
 /*------------------------------------------Sign_up Page------------------------------------------*/
-
 .sign-up-form {
   background: transparent;
   border: 2px solid rgba(255, 255, 255, 0.5);
@@ -428,4 +427,97 @@ button {
   font-size: 1em;
   font-weight: 600;
   margin-top: 15px;
+}
+
+/*------------------------------------------student page------------------------------------------*/
+
+/* Container for Available Classes */
+.container-available-classes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, auto));
+  gap: 2rem;
+  text-align: center;
+  margin-top: 30px; /* Adjust as needed */
+}
+
+/* Style for each class box */
+.container-class-box {
+  padding: 20px;
+  background: var(--other-color);
+  border-radius: 3rem;
+  margin-bottom: 20px;
+}
+
+/* Additional styling for class box contents */
+.container-class-box h3 {
+  font-size: 21px;
+  font-weight: bold;
+  margin: 16px 0;
+}
+
+.container-class-box a {
+  display: inline-block;
+  padding: 10px 20px;
+  background: var(--main-color);
+  color: var(--bg-color);
+  font-size: var(--p-font);
+  font-weight: 600;
+  letter-spacing: 1px;
+  border-radius: 3rem;
+  text-decoration: none;
+  transition: all 0.5s ease;
+}
+
+.container-class-box a:hover {
+  background: var(--bg-color);
+  color: var(--main-color);
+  transform: scale(1.1);
+  box-shadow: #ff9f0d 0px 1px 25px;
+}
+
+/* Styles for the search form */
+.container-search-form {
+  margin-top: 30px; /* Adjust as needed */
+}
+
+.container-search-form .form-group {
+  margin-bottom: 15px;
+}
+
+.container-search-form label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.container-search-form input,
+.container-search-form select {
+  width: 100%;
+  padding: 10px;
+  border-radius: 3px;
+  border: 1px solid #ccc;
+}
+
+.container-search-form button {
+  display: inline-block;
+  padding: 10px 20px;
+  background: var(--main-color);
+  color: var(--bg-color);
+  font-size: var(--p-font);
+  font-weight: 600;
+  letter-spacing: 1px;
+  border-radius: 3rem;
+  text-decoration: none;
+  transition: all 0.5s ease;
+}
+
+.container-search-form button:hover {
+  background: var(--bg-color);
+  color: var(--main-color);
+  transform: scale(1.1);
+  box-shadow: #ff9f0d 0px 1px 25px;
+}
+
+.content-section {
+  padding: 70px 14% 60px; /* Adjust the padding values as needed */
 }
