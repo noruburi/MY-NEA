@@ -63,9 +63,11 @@ header {
 
 .nav-list {
   display: flex;
+  text-align: center; /* Center the inline-block elements */
 }
 
 .nav-list a {
+  display: inline-block; /* Make each link an inline-block element */
   color: var(--text-color);
   font-size: var(--p-font);
   font-weight: 600;
