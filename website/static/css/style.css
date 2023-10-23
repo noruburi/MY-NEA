@@ -244,23 +244,28 @@ header.sticky {
   min-height: 100vh;
   width: 100%;
   background: none; /* Clear any background set by body */
-  position: relative; /* Add this line */
+  position: relative;
 }
 
 .login .background-img {
   position: absolute;
   top: 0;
   left: 0;
-  width: 100vw; /* Adjusted to 100vw */
-  height: 100vh; /* Adjusted to 100vh */
+  width: 100%;
+  height: 100%;
   z-index: -1;
 }
 
-.login-background img {
-  /* Ensure the image takes up the entire container while maintaining aspect ratio */
+.login .background-img img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.container.my-5 {
+  height: 100vh; /* Set a specific height for the container, adjust as needed */
+  position: relative;
+  z-index: 1; /* Ensure the content is above the background */
 }
 
 .form-box {
